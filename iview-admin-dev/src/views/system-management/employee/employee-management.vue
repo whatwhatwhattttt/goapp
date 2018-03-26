@@ -1,45 +1,56 @@
 <style lang="less">
-    @import './employee-management.less';
+    @import './../system-management.less';
 </style>
 <template>
-    <div class="em">
+    <div >
         <Row>
             <Col span="24">
             <card>
                 <Row>
                     <Col span="8" offset="9">
-                    <p class="employee-title-color">数据宝贵请确认后再删除！</p>
+                    <p class="system-title-color">数据宝贵请确认后再删除！</p>
                     </Col>
                     <Col span="3" offset="3">
-                    <Button @click="admin_user_add=true" long>添加</Button>
+                    <Button @click="admin_user_add_modal=true" long>添加新员工</Button>
                     <!--<Button @click="test" long>测试</Button>-->
-                    <Modal v-model="admin_user_add"
-                           :loading="add_loading"
+                    <Modal v-model="admin_user_add_modal"
+                           :loading="admin_user_add_loading"
                            title="添加新员工">
                         <Form ref="admin_add_Form" :label-width="70" :model="form" :rules="rules">
                             <FormItem label="账号" prop="admin_id">
-                                <Input type="text" v-model="form.admin_id" class="employee-add-text"
+                                <Input type="text" v-model="form.admin_id" class="system-text"
                                        placeholder="输入员工账号"/><br>
                             </FormItem>
                             <FormItem label="密码" prop="password">
-                                <Input type="text" v-model="form.password" class="employee-add-text"
+                                <Input type="text" v-model="form.password" class="system-text"
                                        placeholder="输入员工密码"/><br>
                             </FormItem>
                             <FormItem label="姓名" prop="name">
-                                <Input type="text" v-model="form.name" class="employee-add-text"
+                                <Input type="text" v-model="form.name" class="system-text"
                                        placeholder="输入员工姓名"/><br>
                             </FormItem>
                             <FormItem label="年龄" prop="age">
-                                <Input type="text" v-model="form.age" class="employee-add-text"
+                                <Input type="text" v-model="form.age" class="system-text"
                                        placeholder="输入员工年龄"/><br>
                             </FormItem>
                             <FormItem label="工号" prop="job_number">
-                                <Input type="text" v-model="form.job_number" class="employee-add-text"
+                                <Input type="text" v-model="form.job_number" class="system-text"
                                        placeholder="输入员工工号"/><br>
                             </FormItem>
                             <FormItem label="职位" prop="position">
-                                <Input type="text" v-model="form.position" class="employee-add-text"
+                                <Input type="text" v-model="form.position" class="system-text"
                                        placeholder="输入员工职位"/><br>
+                            </FormItem>
+                            <FormItem label="角色">
+                                <CheckboxGroup v-model="form.role">
+                                    <Checkbox label="Eat"></Checkbox>
+                                    <Checkbox label="Sleep"></Checkbox>
+                                    <Checkbox label="Run"></Checkbox>
+                                    <Checkbox label="Movie"></Checkbox>
+                                    <Checkbox label="Eat1"></Checkbox>
+                                    <Checkbox label="Sleep1"></Checkbox>
+                                    <Checkbox label="Run1"></Checkbox>
+                                </CheckboxGroup>
                             </FormItem>
                         </Form>
                         <div slot="footer">
@@ -53,36 +64,47 @@
         </Row>
         <Row>
             <Table border :columns="columns" :data="data"></Table>
-            <div style="float: right;">
+            <div style="text-align: center;">
                 <Page :total="100" :current="1" @on-change="changePage"></Page>
             </div>
-            <Modal v-model="admin_user_edit"
-                   :loading="edit_loading"
+            <Modal v-model="admin_user_edit_modal"
+                   :loading="admin_user_edit_loading"
                    title="员工信息修改">
                 <Form ref="admin_edit_Form" :label-width="70" :model="form2" :rules="rules">
                     <FormItem label="账号" prop="admin_id">
-                        <Input type="text" v-model="form2.admin_id" class="employee-add-text"
+                        <Input type="text" v-model="form2.admin_id" class="system-text"
                                placeholder="输入员工账号"/><br>
                     </FormItem>
                     <FormItem label="密码" prop="password">
-                        <Input type="text" v-model="form2.password" class="employee-add-text"
+                        <Input type="text" v-model="form2.password" class="system-text"
                                placeholder="输入员工密码"/><br>
                     </FormItem>
                     <FormItem label="姓名" prop="name">
-                        <Input type="text" v-model="form2.name" class="employee-add-text"
+                        <Input type="text" v-model="form2.name" class="system-text"
                                placeholder="输入员工姓名"/><br>
                     </FormItem>
                     <FormItem label="年龄" prop="age">
-                        <Input type="text" v-model="form2.age" class="employee-add-text"
+                        <Input type="text" v-model="form2.age" class="system-text"
                                placeholder="输入员工年龄"/><br>
                     </FormItem>
                     <FormItem label="工号" prop="job_number">
-                        <Input type="text" v-model="form2.job_number" class="employee-add-text"
+                        <Input type="text" v-model="form2.job_number" class="system-text"
                                placeholder="输入员工工号"/><br>
                     </FormItem>
                     <FormItem label="职位" prop="position">
-                        <Input type="text" v-model="form2.position" class="employee-add-text"
+                        <Input type="text" v-model="form2.position" class="system-text"
                                placeholder="输入员工职位"/><br>
+                    </FormItem>
+                    <FormItem label="角色">
+                        <CheckboxGroup v-model="form2.role">
+                            <Checkbox label="Eat"></Checkbox>
+                            <Checkbox label="Sleep"></Checkbox>
+                            <Checkbox label="Run"></Checkbox>
+                            <Checkbox label="Movie"></Checkbox>
+                            <Checkbox label="Eat1"></Checkbox>
+                            <Checkbox label="Sleep1"></Checkbox>
+                            <Checkbox label="Run1"></Checkbox>
+                        </CheckboxGroup>
                     </FormItem>
                 </Form>
                 <div slot="footer">
@@ -97,17 +119,27 @@
     export default {
         data () {
             return {
-                admin_user_add: false,
-                admin_user_edit: false,
-                add_loading: false,
-                edit_loading: false,
+                admin_user_add_modal: false,
+                admin_user_edit_modal: false,
+                admin_user_add_loading: false,
+                admin_user_edit_loading: false,
                 form: {
                     admin_id: '',
                     password: '',
                     name: '',
                     age: '',
                     job_number: '',
-                    position: ''
+                    position: '',
+                    role: []
+                },
+                form1: {
+                    admin_id: '',
+                    password: '',
+                    name: '',
+                    age: '',
+                    job_number: '',
+                    position: '',
+                    role:[]
                 },
                 form2: {
                 },
@@ -116,7 +148,8 @@
                         {required: true, message: '账号不能为空', trigger: 'blur'}
                     ],
                     password: [
-                        {required: true, message: '密码不能为空', trigger: 'blur'}
+                        {required: true, message: '密码不能为空', trigger: 'blur'},
+                        {min:6,max:16, message: '密码在6-16位之间', trigger: 'blur'},
                     ],
                     name: [
                         {required: true, message: '姓名不能为空', trigger: 'blur'}
@@ -150,12 +183,17 @@
                     },
                     {
                         title: '工号',
-                        width: 220,
+                        width: 180,
                         key: 'job_number'
                     },
                     {
                         title: '职位',
+                        width: 100,
                         key: 'position'
+                    },
+                    {
+                        title: '角色',
+                        key: 'role'
                     },
                     {
                         title: '账号',
@@ -183,7 +221,7 @@
                                     on: {
                                         click: () => {
                                             this.form2=this.data[params.index];
-                                            this.admin_user_edit=true;
+                                            this.admin_user_edit_modal=true;
                                         }
                                     }
                                 }, '修改'),
@@ -208,6 +246,7 @@
                         age: 18,
                         job_number: 'New York No. 1 Lake Park',
                         position: '仓库管理',
+                        role: [true,false],
                         admin_id: '123123',
                         password: '123234123'
                     },
@@ -216,81 +255,83 @@
                         age: 18,
                         job_number: 'New York No. 1 Lake Park',
                         position: '仓库管理',
+                        role: '仓库管理',
                         admin_id: '123123',
-                        password: '457'
+                        password: '123234123'
                     },
                     {
                         name: 'John Brown',
                         age: 18,
                         job_number: 'New York No. 1 Lake Park',
                         position: '仓库管理',
+                        role: '仓库管理',
                         admin_id: '123123',
-                        password: '123453'
+                        password: '123234123'
                     },
                     {
                         name: 'John Brown',
                         age: 18,
                         job_number: 'New York No. 1 Lake Park',
                         position: '仓库管理',
+                        role: '仓库管理',
                         admin_id: '123123',
-                        password: '12678273'
+                        password: '123234123'
                     },
                     {
                         name: 'John Brown',
                         age: 18,
                         job_number: 'New York No. 1 Lake Park',
                         position: '仓库管理',
-                        admin_id: '1234538993',
-                        password: '122423'
+                        role: '仓库管理',
+                        admin_id: '123123',
+                        password: '123234123'
                     },
                     {
                         name: 'John Brown',
                         age: 18,
                         job_number: 'New York No. 1 Lake Park',
                         position: '仓库管理',
-                        admin_id: '122352123',
-                        password: '123vzxvv123'
+                        role: '仓库管理',
+                        admin_id: '123123',
+                        password: '123234123'
                     },
                     {
                         name: 'John Brown',
                         age: 18,
                         job_number: 'New York No. 1 Lake Park',
                         position: '仓库管理',
-                        admin_id: '12fsgfhdf123',
-                        password: '12asfhf123'
+                        role: '仓库管理',
+                        admin_id: '123123',
+                        password: '123234123'
                     },
                     {
                         name: 'John Brown',
                         age: 18,
                         job_number: 'New York No. 1 Lake Park',
                         position: '仓库管理',
-                        admin_id: 'adw55ryt23',
-                        password: '12dgdddfyr3'
+                        role: '仓库管理',
+                        admin_id: '123123',
+                        password: '123234123'
                     },
                     {
                         name: 'John Brown',
                         age: 18,
                         job_number: 'New York No. 1 Lake Park',
                         position: '仓库管理',
-                        admin_id: '12sfhsfb3123',
-                        password: '123srh123'
+                        role: '仓库管理',
+                        admin_id: '123123',
+                        password: '123234123'
                     },
                     {
                         name: 'John Brown',
                         age: 18,
                         job_number: 'New York No. 1 Lake Park',
                         position: '仓库管理',
-                        admin_id: '12sfhsz43633123',
-                        password: '123123'
-                    },
-                    {
-                        name: 'John Brown',
-                        age: 18,
-                        job_number: 'New York No. 1 Lake Park',
-                        position: '仓库管理',
-                        admin_id: '12fdfsh3123',
-                        password: '123sh577123'
+                        role: '仓库管理',
+                        admin_id: '123123',
+                        password: '123234123'
                     }
+
                 ]
             };
         },
@@ -305,29 +346,30 @@
 //
 //            },
             admin_add () {
-                this.add_loading = true;
+                this.admin_user_add_loading = true;
                 this.$refs.admin_add_Form.validate((valid) => {
                     if (valid) {
                         setTimeout(() => {
-                            this.add_loading = false;
-                            this.admin_user_add = false;
+                            this.admin_user_add_loading = false;
+                            this.admin_user_add_modal = false;
                             this.$Message.success('添加成功');
-                        }, 2000);
+                        }, 500);
                     }
                     else {
                         this.$Message.error('添加失败');
                     }
+                    this.form=this.form1;
                 });
             },
             admin_edit (index) {
-                this.add_loading = true;
+                this.admin_user_add_loading = true;
                 this.$refs.admin_edit_Form.validate((valid) => {
                     if (valid) {
                         setTimeout(() => {
-                            this.edit_loading = false;
-                            this.admin_user_edit = false;
+                            this.admin_user_edit_loading = false;
+                            this.admin_user_edit_modal = false;
                             this.$Message.success('修改成功');
-                        }, 2000);
+                        }, 500);
                     }
                     else {
                         this.$Message.error('修改失败');
