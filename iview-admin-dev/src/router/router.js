@@ -10,6 +10,15 @@ export const loginRouter = {
     component: () => import('@/views/login.vue')
 }
 
+export const testRouter={
+    path:'/test',
+    name:'test',
+    meta:{
+        title:'test'
+    },
+    component:()=>import('@/views/test.vue')
+}
+
 export const page404 = {
     path: '/*',
     name: 'error-404',
@@ -119,6 +128,22 @@ export const appRouter = [
                 name: 'permission-management_index',
                 component: () => import('@/views/system-management/permission/permission-management.vue')
             },
+        ]
+    },
+    {
+        path: '/pay',
+        icon: 'social-yen',
+        name: 'pay',
+        title: '支付管理',
+        access: 1,
+        component: Main,
+        children: [
+            {
+                path: 'index',
+                title:'支付管理',
+                name:'pay_index',
+                component:()=>import('@/views/pay-management/pay.vue')
+            }
         ]
     },
     {
@@ -357,6 +382,7 @@ export const appRouter = [
 // 所有上面定义的路由都要写在下面的routers里
 export const routers = [
     loginRouter,
+    testRouter,
     otherRouter,
     preview,
     locking,

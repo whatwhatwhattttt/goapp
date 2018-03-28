@@ -11,25 +11,7 @@
                     <p class="system-title-color">数据宝贵请确认后再删除！</p>
                     </Col>
                     <Col span="3" offset="3">
-                    <Button @click="admin_permission_add_modal=true" long>添加新权限</Button>
-                    <!--<Button @click="test" long>测试</Button>-->
-                    <Modal v-model="admin_permission_add_modal"
-                           :loading="admin_permission_add_loading"
-                           title="添加新权限">
-                        <Form ref="admin_permission_add_Form" :label-width="70" :model="form" :rules="rules">
-                            <FormItem label="权限名称" prop="name">
-                                <Input type="text" v-model="form.name" class="system-text"
-                                       placeholder="输入权限名"/><br>
-                            </FormItem>
-                            <FormItem label="说明" prop="description">
-                                <Input type="text" v-model="form.description" class="system-text"
-                                       placeholder="输入说明"/><br>
-                            </FormItem>
-                        </Form>
-                        <div slot="footer">
-                            <Button type="primary" long @click="admin_add">提交</Button>
-                        </div>
-                    </Modal>
+                    <Button @click="add_modal=true" long>添加新权限</Button>
                     </Col>
                 </Row>
             </card>
@@ -40,24 +22,50 @@
             <div style="text-align: center;">
                 <Page :total="100" :current="1" @on-change="changePage"></Page>
             </div>
-            <Modal v-model="admin_permission_edit_modal"
-                   :loading="admin_permission_edit_loading"
-                   title="权限信息修改">
-                <Form ref="admin_role_edit_Form" :label-width="70" :model="form2" :rules="rules">
-                    <FormItem label="权限名称" prop="name">
-                        <Input type="text" v-model="form2.name" class="system-text"
-                               placeholder="输入权限名"/><br>
-                    </FormItem>
-                    <FormItem label="说明" prop="description">
-                        <Input type="text" v-model="form2.description" class="system-text"
-                               placeholder="输入说明"/><br>
-                    </FormItem>
-                </Form>
-                <div slot="footer">
-                    <Button type="primary" long @click="admin_edit">确定修改</Button>
-                </div>
-            </Modal>
         </Row>
+        <Modal v-model="add_modal"
+               :loading="loading"
+               title="添加新权限">
+            <Form ref="add_Form" :label-width="70" :model="form" :rules="rules">
+                <FormItem label="权限名称" prop="name">
+                    <Input type="text" v-model="form.name" class="system-text"
+                           placeholder="输入权限名"/><br>
+                </FormItem>
+                <FormItem label="说明" prop="description">
+                    <Input type="textarea" v-model="form.description" class="system-text"
+                           placeholder="输入说明"/><br>
+                </FormItem>
+            </Form>
+            <div slot="footer">
+                <Button type="primary" long @click="add">提交</Button>
+            </div>
+        </Modal>
+        <Modal v-model="edit_modal"
+               :loading="loading"
+               title="权限信息修改">
+            <Form ref="edit_Form" :label-width="70" :model="form1" :rules="rules">
+                <FormItem label="权限名称" prop="name">
+                    <Input type="text" v-model="form1.name" class="system-text"
+                           placeholder="输入权限名"/><br>
+                </FormItem>
+                <FormItem label="说明" prop="description">
+                    <Input type="textarea" v-model="form1.description" class="system-text"
+                           placeholder="输入说明"/><br>
+                </FormItem>
+            </Form>
+            <div slot="footer">
+                <Button type="primary" long @click="edit">确定修改</Button>
+            </div>
+        </Modal>
+        <Modal
+                v-model="del_modal"
+                :loading="loading"
+                @on-ok="del">
+            <p style="color:#f60;text-align:center;font-size: 25px">
+                <Icon type="information-circled"></Icon>
+                <span>确定删除？</span>
+            </p>
+        </Modal>
     </div>
 
 </template>
@@ -65,19 +73,21 @@
     export default {
         data () {
             return {
-                admin_permission_add_modal: false,
-                admin_permission_edit_modal: false,
-                admin_permission_add_loading: false,
-                admin_permission_edit_loading: false,
+                add_modal: false,
+                edit_modal: false,
+                del_modal: false,
+                loading: false,
+                place: null,
                 form: {
                     name: '',
                     description: ''
-                },
+                }
+                ,
                 form1: {
                     name: '',
                     description: ''
-                },
-                form2: {},
+                }
+                ,
                 rules: {
                     name: [
                         {required: true, message: '权限名不能为空', trigger: 'blur'}
@@ -85,22 +95,13 @@
                     description: [
                         {required: true, message: '说明不能为空', trigger: 'blur'}
                     ]
-                },
+                }
+                ,
                 columns: [
                     {
                         title: '权限名',
-                        width: 200,
+                        width: 150,
                         key: 'name',
-                        render: (h, params) => {
-                            return h('div', [
-                                h('Icon', {
-                                    props: {
-                                        type: 'person'
-                                    }
-                                }),
-                                h('strong', params.row.name)
-                            ]);
-                        }
                     },
                     {
                         title: '权限说明',
@@ -123,8 +124,9 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.form2 = this.data[params.index];
-                                            this.admin_permission_edit_modal = true;
+                                            this.place = params.index;
+                                            this.form1 = this.data[this.place];
+                                            this.edit_modal = true;
                                         }
                                     }
                                 }, '修改'),
@@ -135,7 +137,8 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.remove(params.index);
+                                            this.place = params.index;
+                                            this.del_modal=true;
                                         }
                                     }
                                 }, '删除')
@@ -173,54 +176,76 @@
                         description: '123234123'
                     },
                 ]
-            };
+            }
+                ;
         },
         methods: {
-
-            test(){
-//                alert(111);
-//                alert(Cookies.get());
-            },
 //            todo 分页操作
 //            pagechange(){
 //
 //            },
-            admin_add () {
-                this.admin_permission_add_loading = true;
-                this.$refs.admin_permission_add_Form.validate((valid) => {
+            add () {
+                this.loading = true;
+                this.$refs.add_Form.validate((valid) => {
                     if (valid) {
                         setTimeout(() => {
-                            this.admin_permission_add_loading = false;
-                            this.admin_permission_add_modal = false;
-                            this.$Message.success('添加成功');
-                        }, 500);
-                    }
-                    else {
-                        this.$Message.error('添加失败');
-                    }
-                    this.form=this.form1;
-                    alert(1);
-                });
-            },
-            admin_edit (index) {
-                this.admin_permission_add_loading = true;
-                this.$refs.admin_role_edit_Form.validate((valid) => {
-                    if (valid) {
-                        setTimeout(() => {
-                            this.admin_permission_edit_loading = false;
-                            this.admin_permission_edit_modal = false;
-                            this.$Message.success('修改成功');
-                        }, 500);
-                    }
-                    else {
-                        this.$Message.error('修改失败');
-                    }
-                });
-            },
-            remove (index) {
-                this.data.splice(index, 1);
-            }
+                            this.loading = false;
+                            this.add_modal = false;
+                            //todo 向api请求修改
+                            if (1) //api返回条件
+                            {
+                                this.form = [];
+                                this.$Message.success('添加成功');
+                            }
+                            else {
+                                this.$Message.error('添加失败-');
+                            }
 
+                        }, 500);
+                    }
+                    else {
+                        this.$Message.error('添加失败-请完善表单信息后重新提交');
+                    }
+                });
+            },
+            edit () {
+                this.loading = true;
+                this.$refs.edit_Form.validate((valid) => {
+                    if (valid) {
+                        setTimeout(() => {
+                            this.loading = false;
+                            this.edit_modal = false;
+                            //todo 向api请求修改
+                            if (1) //api返回条件
+                            {
+                                this.$Message.success('修改成功');
+                            }
+                            else {
+                                this.$Message.error('修改失败');
+                            }
+                        }, 500);
+                    }
+                    else {
+                        this.$Message.error('修改失败-请完善表单后重新提交');
+                    }
+                });
+            },
+            del () {
+                this.loading = true;
+                setTimeout(() => {
+                    this.loading = false;
+                    this.del_modal = false;
+                    //todo 向api请求修改
+                    if (1) //api返回条件
+                    {
+                        this.data.splice(this.place, 1);
+                        this.$Message.success('删除成功');
+                    }
+                    else {
+                        this.$Message.error('删除失败');
+                    }
+                }, 500);
+            }
         }
     };
 </script>

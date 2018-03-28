@@ -2,7 +2,7 @@
     @import './../system-management.less';
 </style>
 <template>
-    <div >
+    <div>
         <Row>
             <Col span="24">
             <card>
@@ -11,52 +11,7 @@
                     <p class="system-title-color">数据宝贵请确认后再删除！</p>
                     </Col>
                     <Col span="3" offset="3">
-                    <Button @click="admin_user_add_modal=true" long>添加新员工</Button>
-                    <!--<Button @click="test" long>测试</Button>-->
-                    <Modal v-model="admin_user_add_modal"
-                           :loading="admin_user_add_loading"
-                           title="添加新员工">
-                        <Form ref="admin_add_Form" :label-width="70" :model="form" :rules="rules">
-                            <FormItem label="账号" prop="admin_id">
-                                <Input type="text" v-model="form.admin_id" class="system-text"
-                                       placeholder="输入员工账号"/><br>
-                            </FormItem>
-                            <FormItem label="密码" prop="password">
-                                <Input type="text" v-model="form.password" class="system-text"
-                                       placeholder="输入员工密码"/><br>
-                            </FormItem>
-                            <FormItem label="姓名" prop="name">
-                                <Input type="text" v-model="form.name" class="system-text"
-                                       placeholder="输入员工姓名"/><br>
-                            </FormItem>
-                            <FormItem label="年龄" prop="age">
-                                <Input type="text" v-model="form.age" class="system-text"
-                                       placeholder="输入员工年龄"/><br>
-                            </FormItem>
-                            <FormItem label="工号" prop="job_number">
-                                <Input type="text" v-model="form.job_number" class="system-text"
-                                       placeholder="输入员工工号"/><br>
-                            </FormItem>
-                            <FormItem label="职位" prop="position">
-                                <Input type="text" v-model="form.position" class="system-text"
-                                       placeholder="输入员工职位"/><br>
-                            </FormItem>
-                            <FormItem label="角色">
-                                <CheckboxGroup v-model="form.role">
-                                    <Checkbox label="Eat"></Checkbox>
-                                    <Checkbox label="Sleep"></Checkbox>
-                                    <Checkbox label="Run"></Checkbox>
-                                    <Checkbox label="Movie"></Checkbox>
-                                    <Checkbox label="Eat1"></Checkbox>
-                                    <Checkbox label="Sleep1"></Checkbox>
-                                    <Checkbox label="Run1"></Checkbox>
-                                </CheckboxGroup>
-                            </FormItem>
-                        </Form>
-                        <div slot="footer">
-                            <Button type="primary" long @click="admin_add">提交</Button>
-                        </div>
-                    </Modal>
+                    <Button @click="add_modal=true" long>添加新员工</Button>
                     </Col>
                 </Row>
             </card>
@@ -67,62 +22,107 @@
             <div style="text-align: center;">
                 <Page :total="100" :current="1" @on-change="changePage"></Page>
             </div>
-            <Modal v-model="admin_user_edit_modal"
-                   :loading="admin_user_edit_loading"
-                   title="员工信息修改">
-                <Form ref="admin_edit_Form" :label-width="70" :model="form2" :rules="rules">
-                    <FormItem label="账号" prop="admin_id">
-                        <Input type="text" v-model="form2.admin_id" class="system-text"
-                               placeholder="输入员工账号"/><br>
-                    </FormItem>
-                    <FormItem label="密码" prop="password">
-                        <Input type="text" v-model="form2.password" class="system-text"
-                               placeholder="输入员工密码"/><br>
-                    </FormItem>
-                    <FormItem label="姓名" prop="name">
-                        <Input type="text" v-model="form2.name" class="system-text"
-                               placeholder="输入员工姓名"/><br>
-                    </FormItem>
-                    <FormItem label="年龄" prop="age">
-                        <Input type="text" v-model="form2.age" class="system-text"
-                               placeholder="输入员工年龄"/><br>
-                    </FormItem>
-                    <FormItem label="工号" prop="job_number">
-                        <Input type="text" v-model="form2.job_number" class="system-text"
-                               placeholder="输入员工工号"/><br>
-                    </FormItem>
-                    <FormItem label="职位" prop="position">
-                        <Input type="text" v-model="form2.position" class="system-text"
-                               placeholder="输入员工职位"/><br>
-                    </FormItem>
-                    <FormItem label="角色">
-                        <CheckboxGroup v-model="form2.role">
-                            <Checkbox label="Eat"></Checkbox>
-                            <Checkbox label="Sleep"></Checkbox>
-                            <Checkbox label="Run"></Checkbox>
-                            <Checkbox label="Movie"></Checkbox>
-                            <Checkbox label="Eat1"></Checkbox>
-                            <Checkbox label="Sleep1"></Checkbox>
-                            <Checkbox label="Run1"></Checkbox>
-                        </CheckboxGroup>
-                    </FormItem>
-                </Form>
-                <div slot="footer">
-                    <Button type="primary" long @click="admin_edit">确定修改</Button>
-                </div>
-            </Modal>
-        </Row>
-    </div>
 
+        </Row>
+        <Modal v-model="add_modal"
+               :loading="loading"
+               title="添加新员工">
+            <Form ref="add_Form" :label-width="70" :model="form" :rules="rules">
+                <FormItem label="账号" prop="admin_id">
+                    <Input type="text" v-model="form.admin_id" class="system-text"
+                           placeholder="输入员工账号"/><br>
+                </FormItem>
+                <FormItem label="密码" prop="password">
+                    <Input type="text" v-model="form.password" class="system-text"
+                           placeholder="输入员工密码"/><br>
+                </FormItem>
+                <FormItem label="姓名" prop="name">
+                    <Input type="text" v-model="form.name" class="system-text"
+                           placeholder="输入员工姓名"/><br>
+                </FormItem>
+                <FormItem label="年龄" prop="age">
+                    <Input type="text" v-model="form.age" class="system-text"
+                           placeholder="输入员工年龄"/><br>
+                </FormItem>
+                <FormItem label="工号" prop="job_number">
+                    <Input type="text" v-model="form.job_number" class="system-text"
+                           placeholder="输入员工工号"/><br>
+                </FormItem>
+                <FormItem label="职位" prop="position">
+                    <Input type="text" v-model="form.position" class="system-text"
+                           placeholder="输入员工职位"/><br>
+                </FormItem>
+                <FormItem label="角色">
+                    <CheckboxGroup v-model="form.role_array">
+                        <Checkbox v-for="item in createrole" :label=item></Checkbox>
+                    </CheckboxGroup>
+                </FormItem>
+            </Form>
+            <div slot="footer">
+                <Button type="primary" long @click="add">提交</Button>
+            </div>
+        </Modal>
+        <Modal v-model="edit_modal"
+               :loading="loading"
+               title="员工信息修改">
+            <Form ref="edit_Form" :label-width="70" :model="form1" :rules="rules">
+                <FormItem label="账号" prop="admin_id">
+                    <Input type="text" v-model="form1.admin_id" class="system-text"
+                           placeholder="输入员工账号"/><br>
+                </FormItem>
+                <FormItem label="密码" prop="password">
+                    <Input type="text" v-model="form1.password" class="system-text"
+                           placeholder="输入员工密码"/><br>
+                </FormItem>
+                <FormItem label="姓名" prop="name">
+                    <Input type="text" v-model="form1.name" class="system-text"
+                           placeholder="输入员工姓名"/><br>
+                </FormItem>
+                <FormItem label="年龄" prop="age">
+                    <Input type="text" v-model="form1.age" class="system-text"
+                           placeholder="输入员工年龄"/><br>
+                </FormItem>
+                <FormItem label="工号" prop="job_number">
+                    <Input type="text" v-model="form1.job_number" class="system-text"
+                           placeholder="输入员工工号"/><br>
+                </FormItem>
+                <FormItem label="职位" prop="position">
+                    <Input type="text" v-model="form1.position" class="system-text"
+                           placeholder="输入员工职位"/><br>
+                </FormItem>
+                <FormItem label="角色">
+                    <CheckboxGroup v-model="form1.role_array">
+                        <Checkbox v-for="item in createrole" :label=item></Checkbox>
+                    </CheckboxGroup>
+                </FormItem>
+            </Form>
+            <div slot="footer">
+                <Button type="primary" long @click="edit">确定修改</Button>
+            </div>
+        </Modal>
+        <Modal
+                v-model="del_modal"
+                :loading="loading"
+                @on-ok="del">
+            <p style="color:#f60;text-align:center;font-size: 25px">
+                <Icon type="information-circled"></Icon>
+                <span>确定删除？</span>
+            </p>
+        </Modal>
+    </div>
 </template>
 <script>
     export default {
+
         data () {
             return {
-                admin_user_add_modal: false,
-                admin_user_edit_modal: false,
-                admin_user_add_loading: false,
-                admin_user_edit_loading: false,
+                add_modal: false,
+                edit_modal: false,
+                del_modal: false,
+                loading: false,
+                place: null,
+                //todo 向api请求角色数组
+                createrole: ['1', '2', '3', '4'],
                 form: {
                     admin_id: '',
                     password: '',
@@ -130,7 +130,8 @@
                     age: '',
                     job_number: '',
                     position: '',
-                    role: []
+                    role: '',
+                    role_array: []
                 },
                 form1: {
                     admin_id: '',
@@ -139,9 +140,8 @@
                     age: '',
                     job_number: '',
                     position: '',
-                    role:[]
-                },
-                form2: {
+                    role: '',
+                    role_array: []
                 },
                 rules: {
                     admin_id: [
@@ -149,7 +149,7 @@
                     ],
                     password: [
                         {required: true, message: '密码不能为空', trigger: 'blur'},
-                        {min:6,max:16, message: '密码在6-16位之间', trigger: 'blur'},
+                        {min: 6, max: 16, message: '密码在6-16位之间', trigger: 'blur'},
                     ],
                     name: [
                         {required: true, message: '姓名不能为空', trigger: 'blur'}
@@ -164,6 +164,7 @@
                 columns: [
                     {
                         title: '姓名',
+                        width:150,
                         key: 'name',
                         render: (h, params) => {
                             return h('div', [
@@ -220,8 +221,9 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.form2=this.data[params.index];
-                                            this.admin_user_edit_modal=true;
+                                            this.place = params.index;
+                                            this.form1 = this.data[params.index];
+                                            this.edit_modal = true;
                                         }
                                     }
                                 }, '修改'),
@@ -232,7 +234,8 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.remove(params.index);
+                                            this.place = params.index;
+                                            this.del_modal = true;
                                         }
                                     }
                                 }, '删除')
@@ -246,7 +249,8 @@
                         age: 18,
                         job_number: 'New York No. 1 Lake Park',
                         position: '仓库管理',
-                        role: [true,false],
+                        role: '1,2',
+                        role_array: ['1', '2'],
                         admin_id: '123123',
                         password: '123234123'
                     },
@@ -331,53 +335,75 @@
                         admin_id: '123123',
                         password: '123234123'
                     }
-
                 ]
             };
         },
         methods: {
-
-            test(){
-//                alert(111);
-//                alert(Cookies.get());
-            },
 //            todo 分页操作
 //            pagechange(){
 //
 //            },
-            admin_add () {
-                this.admin_user_add_loading = true;
-                this.$refs.admin_add_Form.validate((valid) => {
+            add () {
+                this.loading = true;
+                this.$refs.add_Form.validate((valid) => {
                     if (valid) {
                         setTimeout(() => {
-                            this.admin_user_add_loading = false;
-                            this.admin_user_add_modal = false;
-                            this.$Message.success('添加成功');
+                            this.loading = false;
+                            this.add_modal = false;
+                            //todo 向api插入员工数据
+
+                            if (1)//返回值判断
+                            {
+                                this.form = [];
+                                this.$Message.success('添加成功');
+                            }
+                            else {
+                                this.$Message.error('添加失败');
+                            }
                         }, 500);
                     }
                     else {
-                        this.$Message.error('添加失败');
+                        this.$Message.error('添加失败-请完善表单信息后重新提交');
                     }
-                    this.form=this.form1;
                 });
             },
-            admin_edit (index) {
-                this.admin_user_add_loading = true;
-                this.$refs.admin_edit_Form.validate((valid) => {
+            edit () {
+                this.loading = true;
+                this.$refs.edit_Form.validate((valid) => {
                     if (valid) {
                         setTimeout(() => {
-                            this.admin_user_edit_loading = false;
-                            this.admin_user_edit_modal = false;
-                            this.$Message.success('修改成功');
+                            this.loading = false;
+                            this.edit_modal = false;
+                            //todo 修改api员工数据
+
+                            if (1)//判断api返回值
+                            {
+                                this.data[this.place].role = this.form1.role_array.join(",");
+                                this.$Message.success('修改成功');
+                            }
+                            else {
+                                this.$Message.error('修改失败');
+                            }
                         }, 500);
+                    }
+                });
+            },
+            del () {
+                this.loading = true;
+                setTimeout(() => {
+                    this.loading = false;
+                    this.del_modal = false;
+                    //todo 从api删除当前员工
+                    if (1)//判断api返回值
+                    {
+                        this.data.splice(this.place, 1);
+                        this.$Message.success('修改成功');
                     }
                     else {
                         this.$Message.error('修改失败');
                     }
-                });
-            },
-            remove (index) {
-                this.data.splice(index, 1);
+                }, 500);
+
             }
 
         }
