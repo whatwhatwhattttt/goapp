@@ -11,36 +11,7 @@
                     <p class="system-title-color">数据宝贵请确认后再删除！</p>
                     </Col>
                     <Col span="3" offset="3">
-                    <Button @click="admin_role_add_modal=true" long>添加新角色</Button>
-                    <!--<Button @click="test" long>测试</Button>-->
-                    <Modal v-model="admin_role_add_modal"
-                           :loading="admin_role_add_loading"
-                           title="添加新角色">
-                        <Form ref="admin_role_add_Form" :label-width="70" :model="form" :rules="rules">
-                            <FormItem label="角色名称" prop="name">
-                                <Input type="text" v-model="form.name" class="system-text"
-                                       placeholder="输入员工角色名"/><br>
-                            </FormItem>
-                            <FormItem label="说明" prop="description">
-                                <Input type="text" v-model="form.description" class="system-text"
-                                       placeholder="输入"/><br>
-                            </FormItem>
-                            <FormItem label="权限">
-                                <CheckboxGroup v-model="form.permission">
-                                    <Checkbox label="Eat"></Checkbox>
-                                    <Checkbox label="Sleep"></Checkbox>
-                                    <Checkbox label="Run"></Checkbox>
-                                    <Checkbox label="Movie"></Checkbox>
-                                    <Checkbox label="Eat1"></Checkbox>
-                                    <Checkbox label="Sleep1"></Checkbox>
-                                    <Checkbox label="Run1"></Checkbox>
-                                </CheckboxGroup>
-                            </FormItem>
-                        </Form>
-                        <div slot="footer">
-                            <Button type="primary" long @click="admin_add">提交</Button>
-                        </div>
-                    </Modal>
+                    <Button @click="add_modal=true" long>添加新角色</Button>
                     </Col>
                 </Row>
             </card>
@@ -49,59 +20,89 @@
         <Row>
             <Table border :columns="columns" :data="data"></Table>
             <div style="text-align: center;">
-                <Page :total="100" :current="1" @on-change="changePage"></Page>
+                <Page :total="500" :current="1" @on-change="changePage"></Page>
             </div>
-            <Modal v-model="admin_role_edit_modal"
-                   :loading="admin_role_edit_loading"
-                   title="员工信息修改">
-                <Form ref="admin_role_edit_Form" :label-width="70" :model="form2" :rules="rules">
-                    <FormItem label="角色名称" prop="name">
-                        <Input type="text" v-model="form2.name" class="system-text"
-                               placeholder="输入员工角色名"/><br>
-                    </FormItem>
-                    <FormItem label="说明" prop="description">
-                        <Input type="text" v-model="form2.description" class="system-text"
-                               placeholder="输入说明"/><br>
-                    </FormItem>
-                    <FormItem label="权限">
-                        <CheckboxGroup v-model="form.permission">
-                            <Checkbox label="Eat"></Checkbox>
-                            <Checkbox label="Sleep"></Checkbox>
-                            <Checkbox label="Run"></Checkbox>
-                            <Checkbox label="Movie"></Checkbox>
-                            <Checkbox label="Eat1"></Checkbox>
-                            <Checkbox label="Sleep1"></Checkbox>
-                            <Checkbox label="Run1"></Checkbox>
-                        </CheckboxGroup>
-                    </FormItem>
-                </Form>
-                <div slot="footer">
-                    <Button type="primary" long @click="admin_edit">确定修改</Button>
-                </div>
-            </Modal>
-        </Row>
-    </div>
 
+        </Row>
+        <Modal v-model="add_modal"
+               :loading="loading"
+               title="添加新角色">
+            <Form ref="add_Form" :label-width="70" :model="form" :rules="rules">
+                <FormItem label="角色名称" prop="name">
+                    <Input type="text" v-model="form.name" class="system-text"
+                           placeholder="输入员工角色名"/><br>
+                </FormItem>
+                <FormItem label="说明" prop="description">
+                    <Input type="text" v-model="form.description" class="system-text"
+                           placeholder="输入"/><br>
+                </FormItem>
+                <FormItem label="权限">
+                    <CheckboxGroup v-model="form.permission_array">
+                        <Checkbox v-for="item in create_permission" :label=item></Checkbox>
+                    </CheckboxGroup>
+                </FormItem>
+            </Form>
+            <div slot="footer">
+                <Button type="primary" long @click="add">提交</Button>
+            </div>
+        </Modal>
+        <Modal v-model="edit_modal"
+               :loading="loading"
+               title="员工信息修改">
+            <Form ref="edit_Form" :label-width="70" :model="form1" :rules="rules">
+                <FormItem label="角色名称" prop="name">
+                    <Input type="text" v-model="form1.name" class="system-text"
+                           placeholder="输入员工角色名"/><br>
+                </FormItem>
+                <FormItem label="说明" prop="description">
+                    <Input type="text" v-model="form1.description" class="system-text"
+                           placeholder="输入说明"/><br>
+                </FormItem>
+                <FormItem label="权限">
+                    <CheckboxGroup v-model="form1.permission_array">
+                        <Checkbox v-for="item in create_permission" :label=item></Checkbox>
+                    </CheckboxGroup>
+                </FormItem>
+            </Form>
+            <div slot="footer">
+                <Button type="primary" long @click="edit">确定修改</Button>
+            </div>
+        </Modal>
+        <Modal
+                v-model="del_modal"
+                :loading="loading"
+                @on-ok="del">
+            <p style="color:#f60;text-align:center;font-size: 25px">
+                <Icon type="information-circled"></Icon>
+                <span>确定删除？</span>
+            </p>
+        </Modal>
+    </div>
 </template>
 <script>
     export default {
         data () {
             return {
-                admin_role_add_modal: false,
-                admin_role_edit_modal: false,
-                admin_role_add_loading: false,
-                admin_role_edit_loading: false,
+                add_modal: false,
+                edit_modal: false,
+                del_modal: false,
+                loading: false,
+                // 当前选择的行在data数据中的位置 例 place:0,当前选中data第一行数据
+                place: null,
+                //todo 向api请求权限数组
+                create_permission: ['1', '2', '3', '4'],
                 form: {
                     name: '',
                     description: '',
-                    permission:[]
+                    permission: '',
+                    permission_array: []
                 },
                 form1: {
                     name: '',
                     description: '',
-                    permission:[]
+                    permission: '',
+                    permission_array: []
                 },
-                form2: {},
                 rules: {
                     name: [
                         {required: true, message: '角色名不能为空', trigger: 'blur'}
@@ -113,18 +114,8 @@
                 columns: [
                     {
                         title: '角色名',
-                        width: 200,
-                        key: 'name',
-                        render: (h, params) => {
-                            return h('div', [
-                                h('Icon', {
-                                    props: {
-                                        type: 'person'
-                                    }
-                                }),
-                                h('strong', params.row.name)
-                            ]);
-                        }
+                        width: 150,
+                        key: 'name'
                     },
                     {
                         title: '说明',
@@ -151,8 +142,9 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.form2 = this.data[params.index];
-                                            this.admin_role_edit_modal = true;
+                                            this.place = params.index;
+                                            this.form1 = this.data[this.place];
+                                            this.edit_modal = true;
                                         }
                                     }
                                 }, '修改'),
@@ -163,7 +155,8 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.remove(params.index);
+                                            this.place = params.index;
+                                            this.del_modal = true;
                                         }
                                     }
                                 }, '删除')
@@ -173,89 +166,113 @@
                 ],
                 data: [
                     {
-                        name: '123123',
-                        description: '123234123',
-                        permission:[]
+                        name: 'zzz',
+                        description: 'sdfsdf',
+                        permission: '1,2',
+                        permission_array: ['2', '3']
                     },
                     {
-                        name: '123123',
-                        description: '123234123',
-                        permission:[]
+                        name: 'fghfgj',
+                        description: 'dfhfghf',
+                        permission: '1,2',
+                        permission_array: ['2', '3']
                     },
                     {
-                        name: '123123',
-                        description: '123234123',
-                        permission:[]
+                        name: 'e5yrthfg',
+                        description: 'fdg434ythgfd',
+                        permission: '1,2',
+                        permission_array: ['2', '3']
                     },
                     {
-                        name: '123123',
-                        description: '123234123',
-                        permission:[]
+                        name: '35yhtreew',
+                        description: '5htrytegew',
+                        permission: '1,2',
+                        permission_array: ['2', '3']
                     },
                     {
-                        name: '123123',
-                        description: '123234123',
-                        permission:[]
+                        name: 'dse4rytbgesdxc',
+                        description: 'regsfd4e',
+                        permission: '1,2',
+                        permission_array: ['2', '3']
                     },
                     {
-                        name: '123123',
-                        description: '123234123',
-                        permission:[]
-                    },
-                    {
-                        name: '123123',
-                        description: '123234123',
-                        permission:[]
-                    },
+                        name: 'w456yjnthrw',
+                        description: 'wrhetmh45jy456u6534',
+                        permission: '1,2',
+                        permission_array: ['2', '3']
+                    }
                 ]
             };
         },
         methods: {
-
-            test(){
-//                alert(111);
-//                alert(Cookies.get());
-            },
 //            todo 分页操作
 //            pagechange(){
 //
 //            },
-            admin_add () {
-                this.admin_role_add_loading = true;
-                this.$refs.admin_role_add_Form.validate((valid) => {
+            add () {
+                this.loading = true;
+                this.$refs.add_Form.validate((valid) => {
                     if (valid) {
                         setTimeout(() => {
-                            this.admin_role_add_loading = false;
-                            this.admin_role_add_modal = false;
-                            this.$Message.success('添加成功');
-                        }, 500);
-                    }
-                    else {
-                        this.$Message.error('添加失败');
-                    }
-                    this.form=this.form1;
-                    alert(1);
-                });
-            },
-            admin_edit (index) {
-                this.admin_role_add_loading = true;
-                this.$refs.admin_role_edit_Form.validate((valid) => {
-                    if (valid) {
-                        setTimeout(() => {
-                            this.admin_role_edit_loading = false;
-                            this.admin_role_edit_modal = false;
-                            this.$Message.success('修改成功');
-                        }, 500);
-                    }
-                    else {
-                        this.$Message.error('修改失败');
-                    }
-                });
-            },
-            remove (index) {
-                this.data.splice(index, 1);
-            }
+                            this.loading = false;
+                            this.add_modal = false;
+                            //todo 向api请求修改
+                            if (1) //api返回条件
+                            {
+                                this.form = [];
+                                this.$Message.success('添加成功');
+                            }
+                            else {
+                                this.$Message.error('添加失败-');
+                            }
 
+                        }, 500);
+                    }
+                    else {
+                        this.$Message.error('添加失败-请完善表单信息后重新提交');
+                    }
+                });
+            },
+            edit () {
+                this.loading = true;
+                this.$refs.edit_Form.validate((valid) => {
+                    if (valid) {
+                        setTimeout(() => {
+                            this.loading = false;
+                            this.edit_modal = false;
+                            //todo 向api请求修改
+                            
+                            if (1) //api返回条件
+                            {
+                                this.data[this.place].permission = this.form1.permission_array.join(",");
+                                this.$Message.success('修改成功');
+                            }
+                            else {
+                                this.$Message.error('修改失败');
+                            }
+                        }, 500);
+                    }
+                    else {
+                        this.$Message.error('修改失败-请完善表单后重新提交');
+                    }
+                });
+            },
+            del () {
+                this.loading = true;
+                setTimeout(() => {
+                    this.loading = false;
+                    this.del_modal = false;
+                    //todo 向api请求修改
+                    if (1) //api返回条件
+                    {
+                        this.data.splice(this.place, 1);
+                        this.$Message.success('删除成功');
+                    }
+                    else {
+                        this.$Message.error('删除失败');
+                    }
+                }, 500);
+            }
         }
     };
 </script>
