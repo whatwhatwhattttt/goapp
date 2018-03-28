@@ -1,6 +1,6 @@
 <style lang="less">
     @import './pay.less';
-    @import "./../../styles/common.less";
+    @import './../../styles/common.less';
 </style>
 <template>
     <div>

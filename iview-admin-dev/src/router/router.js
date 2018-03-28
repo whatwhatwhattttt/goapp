@@ -10,13 +10,13 @@ export const loginRouter = {
     component: () => import('@/views/login.vue')
 }
 
-export const testRouter={
-    path:'/test',
-    name:'test',
-    meta:{
-        title:'test'
+export const testRouter = {
+    path: '/test',
+    name: 'test',
+    meta: {
+        title: 'test'
     },
-    component:()=>import('@/views/test.vue')
+    component: () => import('@/views/test.vue')
 }
 
 export const page404 = {
@@ -108,24 +108,24 @@ export const appRouter = [
         component: Main,
         children: [
             {
-                path: 'employee',
+                path: 'employee-management',
                 title: '员工管理',
                 icon: 'person-add',
-                name: 'employee-management_index',
+                name: 'employee-management',
                 component: () => import('@/views/system-management/employee/employee-management.vue')
             },
             {
-                path: 'role',
+                path: 'role-management',
                 title: '角色管理',
                 icon: 'ios-body',
-                name: 'role-management_index',
+                name: 'role-management',
                 component: () => import('@/views/system-management/role/role-management.vue')
             },
             {
-                path: 'permission',
-                title: ' 权限管理',
+                path: 'permission-management',
+                title: '权限管理',
                 icon: 'key',
-                name: 'permission-management_index',
+                name: 'permission-management',
                 component: () => import('@/views/system-management/permission/permission-management.vue')
             },
         ]
@@ -140,9 +140,25 @@ export const appRouter = [
         children: [
             {
                 path: 'index',
-                title:'支付管理',
-                name:'pay_index',
-                component:()=>import('@/views/pay-management/pay.vue')
+                title: '支付管理',
+                name: 'pay_index',
+                component: () => import('@/views/pay-management/pay.vue')
+            }
+        ]
+    },
+    {
+        path: '/log',
+        icon: 'document-text',
+        name: 'log',
+        title: '系统日志',
+        access: 1,
+        component: Main,
+        children: [
+            {
+                path: 'index',
+                title: '系统日志',
+                name: 'log_index',
+                component: () => import('@/views/system-log/log.vue')
             }
         ]
     },
