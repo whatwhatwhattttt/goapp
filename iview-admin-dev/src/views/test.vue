@@ -20,8 +20,6 @@
                 role: '12',
                 rolearray: ['1', '2']
             };
-        },
-        role = rolearray.join(",");
-    }
-    ;
+        }
+    };
 </script>
