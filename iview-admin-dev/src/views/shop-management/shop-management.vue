@@ -8,11 +8,12 @@
             <card>
                 <Row>
                     <Col span="8" offset="9">
-                    <p class="system-title-color">数据宝贵请确认后再删除！</p>
+                    <p class="shop-title-color">数据宝贵请确认后再删除！</p>
                     </Col>
-                    <Col span="3" offset="3">
-                    <Button @click="add_modal=true" long>添加新员工</Button>
-                    </Col>
+                    <!--todo 以下功能按钮改成搜索-->
+                    <!--<Col span="3" offset="3">-->
+                    <!--<Button @click="add_modal=true" long>添加新员工</Button>-->
+                    <!--</Col>-->
                 </Row>
             </card>
             </Col>
@@ -24,70 +25,32 @@
             </div>
 
         </Row>
-        <Modal v-model="add_modal"
-               :loading="loading"
-               title="添加新员工">
-            <Form ref="add_Form" :label-width="70" :model="form" :rules="rules">
-                <FormItem label="账号" prop="admin_id">
-                    <Input type="text" v-model="form.admin_id" class="system-text"
-                           placeholder="输入员工账号"/><br>
-                </FormItem>
-                <FormItem label="密码" prop="password">
-                    <Input type="text" v-model="form.password" class="system-text"
-                           placeholder="输入员工密码"/><br>
-                </FormItem>
-                <FormItem label="姓名" prop="name">
-                    <Input type="text" v-model="form.name" class="system-text"
-                           placeholder="输入员工姓名"/><br>
-                </FormItem>
-                <FormItem label="年龄" prop="age">
-                    <Input type="text" v-model="form.age" class="system-text"
-                           placeholder="输入员工年龄"/><br>
-                </FormItem>
-                <FormItem label="工号" prop="job_number">
-                    <Input type="text" v-model="form.job_number" class="system-text"
-                           placeholder="输入员工工号"/><br>
-                </FormItem>
-                <FormItem label="职位" prop="position">
-                    <Input type="text" v-model="form.position" class="system-text"
-                           placeholder="输入员工职位"/><br>
-                </FormItem>
-                <FormItem label="角色">
-                    <CheckboxGroup v-model="form.role_array">
-                        <Checkbox v-for="item in createrole" :label=item></Checkbox>
-                    </CheckboxGroup>
-                </FormItem>
-            </Form>
-            <div slot="footer">
-                <Button type="primary" long @click="add">提交</Button>
-            </div>
-        </Modal>
         <Modal v-model="edit_modal"
                :loading="loading"
                title="员工信息修改">
             <Form ref="edit_Form" :label-width="70" :model="form1" :rules="rules">
                 <FormItem label="账号" prop="admin_id">
-                    <Input type="text" v-model="form1.admin_id" class="system-text"
+                    <Input type="text" v-model="form1.admin_id" class="shop-text"
                            placeholder="输入员工账号"/><br>
                 </FormItem>
                 <FormItem label="密码" prop="password">
-                    <Input type="text" v-model="form1.password" class="system-text"
+                    <Input type="text" v-model="form1.password" class="shop-text"
                            placeholder="输入员工密码"/><br>
                 </FormItem>
                 <FormItem label="姓名" prop="name">
-                    <Input type="text" v-model="form1.name" class="system-text"
+                    <Input type="text" v-model="form1.name" class="shop-text"
                            placeholder="输入员工姓名"/><br>
                 </FormItem>
                 <FormItem label="年龄" prop="age">
-                    <Input type="text" v-model="form1.age" class="system-text"
+                    <Input type="text" v-model="form1.age" class="shop-text"
                            placeholder="输入员工年龄"/><br>
                 </FormItem>
                 <FormItem label="工号" prop="job_number">
-                    <Input type="text" v-model="form1.job_number" class="system-text"
+                    <Input type="text" v-model="form1.job_number" class="shop-text"
                            placeholder="输入员工工号"/><br>
                 </FormItem>
                 <FormItem label="职位" prop="position">
-                    <Input type="text" v-model="form1.position" class="system-text"
+                    <Input type="text" v-model="form1.position" class="shop-text"
                            placeholder="输入员工职位"/><br>
                 </FormItem>
                 <FormItem label="角色">
