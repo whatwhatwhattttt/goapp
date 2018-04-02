@@ -164,7 +164,7 @@
                 columns: [
                     {
                         title: '姓名',
-                        width:150,
+                        width: 150,
                         key: 'name',
                         render: (h, params) => {
                             return h('div', [
@@ -397,10 +397,10 @@
                     if (1)//判断api返回值
                     {
                         this.data.splice(this.place, 1);
-                        this.$Message.success('修改成功');
+                        this.$Message.success('删除成功');
                     }
                     else {
-                        this.$Message.error('修改失败');
+                        this.$Message.error('删除失败');
                     }
                 }, 500);
 
