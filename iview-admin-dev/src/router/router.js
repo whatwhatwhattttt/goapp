@@ -106,6 +106,12 @@ export const otherRouter = {
             name: 'productinfo',
             component: () => import('@/views/product-management/product-info.vue')
         },// 用于展示产品详情页
+        {
+            path: 'transactioninfo',
+            title: '交易详情',
+            name: 'transactioninfo',
+            component: () => import('@/views/transaction-management/transaction-info.vue')
+        },// 用于展示交易详情页
     ]
 }
 
