@@ -48,6 +48,7 @@ export default {
             let name = '';
             let time = '';
             let price = '';
+            console.log(this.$route.query.shopping_id);
             switch (this.$route.query.shopping_id.toString()) {
                 case '100001': name = '《vue.js实战》'; time = '2017年11月12日 13：33：24'; price = '79'; break;
                 case '100002': name = '面包'; time = '2017年11月5日 19：13：24'; price = '10'; break;
