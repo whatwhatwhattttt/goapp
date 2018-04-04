@@ -60,13 +60,14 @@ export const locking = {
 
 // 作为Main组件的子页面展示但是不在左侧菜单显示的路由写在otherRouter里
 export const otherRouter = {
-    path: '/', name: 'otherRouter',
+    path: '/',
+    name: 'otherRouter',
     redirect: '/home',
     component: Main,
     children: [
         {
             path: 'home',
-            title: {i18n: 'home'},
+            title: '首页',
             name: 'home_index',
             component: () => import('@/views/home/home.vue')
         },
@@ -74,7 +75,7 @@ export const otherRouter = {
             path: 'ownspace',
             title: '个人中心',
             name: 'ownspace_index',
-            component: () => import('@/views/own-space/own-space.vue')
+            component: () => import('@/views/ownspace/ownspace.vue')
         },
         {
             path: 'order/:order_id',
@@ -176,7 +177,6 @@ export const appRouter = [
                 path: 'index',
                 title: '用户管理',
                 name: 'user_index',
-                access: 1,
                 component: () => import('@/views/user/user.vue')
             }
         ]
@@ -270,21 +270,21 @@ export const appRouter = [
             }
         ]
     },
-    // {
-    //   path: '/access',
-    //   icon: 'key',
-    //   name: 'access',
-    //   title: '权限管理',
-    //   component: Main,
-    //   children: [
-    //     {
-    //       path: 'index',
-    //       title: '权限管理',
-    //       name: 'access_index',
-    //       component: () => import('@/views/access/access.vue')
-    //     }
-    //   ]
-    // },
+    {
+        path: '/access',
+        icon: 'key',
+        name: 'access',
+        title: '权限管理',
+        component: Main,
+        children: [
+            {
+                path: 'index',
+                title: '权限管理',
+                name: 'access_index',
+                component: () => import('@/views/access/access.vue')
+            }
+        ]
+    },
     // {
     //   path: '/access-test',
     //   icon: 'lock-combination',
@@ -473,29 +473,29 @@ export const appRouter = [
     //     }
     //   ]
     // },
-    {
-        path: '/advanced-router',
-        icon: 'ios-infinite',
-        name: 'advanced-router',
-        title: '高级路由',
-        component: Main,
-        children: [
-            {
-                path: 'mutative-router',
-                title: '动态路由',
-                name: 'mutative-router',
-                icon: 'link',
-                component: () => import('@/views/advanced-router/mutative-router.vue')
-            },
-            {
-                path: 'argument-page',
-                title: '带参页面',
-                name: 'argument-page',
-                icon: 'android-send',
-                component: () => import('@/views/advanced-router/argument-page.vue')
-            }
-        ]
-    }
+    // {
+    //     path: '/advanced-router',
+    //     icon: 'ios-infinite',
+    //     name: 'advanced-router',
+    //     title: '高级路由',
+    //     component: Main,
+    //     children: [
+    //         {
+    //             path: 'mutative-router',
+    //             title: '动态路由',
+    //             name: 'mutative-router',
+    //             icon: 'link',
+    //             component: () => import('@/views/advanced-router/mutative-router.vue')
+    //         },
+    //         {
+    //             path: 'argument-page',
+    //             title: '带参页面',
+    //             name: 'argument-page',
+    //             icon: 'android-send',
+    //             component: () => import('@/views/advanced-router/argument-page.vue')
+    //         }
+    //     ]
+    // }
     // {
     //   path: '/error-page',
     //   icon: 'android-sad',
