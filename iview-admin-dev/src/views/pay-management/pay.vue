@@ -43,9 +43,15 @@
             </card>
         </Row>
         <Row>
-            <Table border :columns="columns" :data="data"/>
-            <div style="text-align: center;">
-                <Page :total="100" :current="1" @on-change="changePage"></Page>
+            <Table border :loading="loading" :columns="columns" :data="data"></Table>
+            <div style="text-align: center">
+                <Page
+                        :total=table_total
+                        :current=1
+                        showTotal
+                        show-elevator
+                        @on-change="changepage">
+                </Page>
             </div>
         </Row>
         <Modal v-model="add_modal"
@@ -117,6 +123,9 @@
                 use_modal: false,
                 del_modal: false,
                 loading: false,
+                table_total: null,
+                current_page: 1,
+                older_page: 1,
                 place: null,
                 form: {
                     wechat: '',
@@ -136,9 +145,9 @@
                 },
                 columns: [
                     {
-                        title: '编号',
-                        width: 70,
-                        key: 'number'
+                        title: '索引',
+                        width: 100,
+                        type: 'index'
                     },
                     {
                         title: '微信账号',
@@ -262,11 +271,27 @@
                 ;
         },
         methods: {
-
-//            todo 分页操作
-//            pagechange(){
-//
-//            },
+            // todo 分页操作
+            // index为页数
+            changepage(index){
+                this.loading = true;
+                this.current_page = index;
+                this.data = [];
+                let current_page_int = parseInt(this.current_page / 10);
+                let older_page_int = parseInt(this.older_page / 10);
+                let fstart = (this.current_page - 1) * 10;
+                let fend = this.current_page * 10 < this.table_total ? this.current_page * 10 : this.table_total;
+                setTimeout(() => {
+                    if (current_page_int != older_page_int) {
+                        // todo 向api请求选中页及附近9页数据
+                        this.older_page = this.current_page;
+                    }
+                    for (let i = fstart; i < fend; i++) {
+                        this.data.push(this.serverdata.data[i]);
+                    }
+                    this.loading = false;
+                }, 500);
+            },
             add() {
                 this.loading = true;
                 this.$refs.pay_add_Form.validate((valid) => {
@@ -276,7 +301,7 @@
                             this.add_modal = false;
                             //todo 向api请求添加数据
 
-                            if(1) //api返回结果
+                            if (1) //api返回结果
                             {
                                 this.form = [];
                                 this.$Message.success('添加成功');
@@ -300,7 +325,7 @@
                             this.edit_modal = false;
                             //todo 向api请求修改数据
 
-                            if(1) //api返回结果
+                            if (1) //api返回结果
                             {
                                 this.$Message.success('修改成功');
                             }
@@ -320,9 +345,9 @@
                     this.loading = false;
                     this.use_modal = false;
                     //todo 数据库修改正在使用的模板
-                    if(1) //api返回结果
+                    if (1) //api返回结果
                     {
-                        this.tip=this.data[this.place];
+                        this.tip = this.data[this.place];
                         this.$Message.success('已启用');
                     }
                     else {
@@ -337,7 +362,7 @@
                     this.del_modal = false;
                     //todo 数据库删除当前模板
 
-                    if(1) //api返回结果
+                    if (1) //api返回结果
                     {
                         this.data.splice(this.place, 1);
                         this.$Message.success('删除成功');
@@ -347,6 +372,71 @@
                     }
                 }, 500);
             }
+        },
+        mounted()
+        {
+            // todo 向api请求100条初始数据并放入serverdata
+            this.serverdata = {
+                //以下为数据格式
+                //数据库中该表共有数据条数
+                datalength: 12,
+                //100条初始数据
+                data: [
+                    {
+                        number: 7,
+                        wechat: '18',
+                        alipay: 'New York No. 1 Lake Park',
+                    },
+                    {
+                        number: 8,
+                        wechat: '18',
+                        alipay: 'New York No. 1 Lake Park',
+                    },
+                    {
+                        number: 9,
+                        wechat: '18',
+                        alipay: 'New York No. 1 Lake Park',
+                    },
+                    {
+                        number: 0,
+                        wechat: '18',
+                        alipay: 'New York No. 1 Lake Park',
+                    },
+                    {
+                        number: 1,
+                        wechat: '18',
+                        alipay: 'New York No. 1 Lake Park',
+                    },
+                    {
+                        number: 2,
+                        wechat: '18',
+                        alipay: 'New York No. 1 Lake Park',
+                    },
+                    {
+                        number: 3,
+                        wechat: '18',
+                        alipay: 'New York No. 1 Lake Park',
+                    },
+                    {
+                        number: 4,
+                        wechat: '18',
+                        alipay: 'New York No. 1 Lake Park',
+                    },
+                    {
+                        number: 5,
+                        wechat: '18',
+                        alipay: 'New York No. 1 Lake Park',
+                    },
+                    {
+                        number: 6,
+                        wechat: '18',
+                        alipay: 'New York No. 1 Lake Park',
+                    }
+
+                ]
+            };
+            this.table_total = this.serverdata.datalength;
+            this.changepage(1);
         }
     };
 </script>

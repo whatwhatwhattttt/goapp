@@ -1,5 +1,5 @@
 <style lang="less">
-    @import './../system-management.less';
+    @import './system-management.less';
 </style>
 <template>
     <div>
@@ -18,11 +18,16 @@
             </Col>
         </Row>
         <Row>
-            <Table border :columns="columns" :data="data"></Table>
-            <div style="text-align: center;">
-                <Page :total="500" :current="1" @on-change="changePage"></Page>
+            <Table border :loading="loading" :columns="columns" :data="data"></Table>
+            <div style="text-align: center">
+                <Page
+                        :total=table_total
+                        :current=1
+                        showTotal
+                        show-elevator
+                        @on-change="changepage">
+                </Page>
             </div>
-
         </Row>
         <Modal v-model="add_modal"
                :loading="loading"
@@ -87,6 +92,9 @@
                 edit_modal: false,
                 del_modal: false,
                 loading: false,
+                table_total: null,
+                current_page: 1,
+                older_page: 1,
                 // 当前选择的行在data数据中的位置 例 place:0,当前选中data第一行数据
                 place: null,
                 //todo 向api请求权限数组
@@ -112,6 +120,11 @@
                     ]
                 },
                 columns: [
+                    {
+                        title: '索引',
+                        width: 100,
+                        type: 'index'
+                    },
                     {
                         title: '角色名',
                         width: 150,
@@ -164,6 +177,104 @@
                         }
                     }
                 ],
+                data: [],
+                serverdata: []
+            };
+        },
+        methods: {
+            // todo 分页操作
+            // index为页数
+            changepage(index){
+                this.loading = true;
+                this.current_page = index;
+                this.data = [];
+                let current_page_int = parseInt(this.current_page / 10);
+                let older_page_int = parseInt(this.older_page / 10);
+                let fstart = (this.current_page - 1) * 10;
+                let fend = this.current_page * 10 < this.table_total ? this.current_page * 10 : this.table_total;
+                setTimeout(() => {
+                    if (current_page_int != older_page_int) {
+                        // todo 向api请求选中页及附近9页数据
+                        this.older_page = this.current_page;
+                    }
+                    for (let i = fstart; i < fend; i++) {
+                        this.data.push(this.serverdata.data[i]);
+                    }
+                    this.loading = false;
+                }, 500);
+            },
+            add () {
+                this.loading = true;
+                this.$refs.add_Form.validate((valid) => {
+                    if (valid) {
+                        setTimeout(() => {
+                            this.loading = false;
+                            this.add_modal = false;
+                            //todo 向api请求修改
+                            if (1) //api返回条件
+                            {
+                                this.form = [];
+                                this.$Message.success('添加成功');
+                            }
+                            else {
+                                this.$Message.error('添加失败-');
+                            }
+
+                        }, 500);
+                    }
+                    else {
+                        this.$Message.error('添加失败-请完善表单信息后重新提交');
+                    }
+                });
+            },
+            edit () {
+                this.loading = true;
+                this.$refs.edit_Form.validate((valid) => {
+                    if (valid) {
+                        setTimeout(() => {
+                            this.loading = false;
+                            this.edit_modal = false;
+                            //todo 向api请求修改
+
+                            if (1) //api返回条件
+                            {
+                                this.data[this.place].permission = this.form1.permission_array.join(",");
+                                this.$Message.success('修改成功');
+                            }
+                            else {
+                                this.$Message.error('修改失败');
+                            }
+                        }, 500);
+                    }
+                    else {
+                        this.$Message.error('修改失败-请完善表单后重新提交');
+                    }
+                });
+            },
+            del () {
+                this.loading = true;
+                setTimeout(() => {
+                    this.loading = false;
+                    this.del_modal = false;
+                    //todo 向api请求修改
+                    if (1) //api返回条件
+                    {
+                        this.data.splice(this.place, 1);
+                        this.$Message.success('删除成功');
+                    }
+                    else {
+                        this.$Message.error('删除失败');
+                    }
+                }, 500);
+            }
+        },
+        mounted () {
+            // todo 向api请求100条初始数据并放入serverdata
+            this.serverdata = {
+                //以下为数据格式
+                //数据库中该表共有数据条数
+                datalength: 6,
+                //100条初始数据
                 data: [
                     {
                         name: 'zzz',
@@ -203,76 +314,8 @@
                     }
                 ]
             };
-        },
-        methods: {
-//            todo 分页操作
-//            pagechange(){
-//
-//            },
-            add () {
-                this.loading = true;
-                this.$refs.add_Form.validate((valid) => {
-                    if (valid) {
-                        setTimeout(() => {
-                            this.loading = false;
-                            this.add_modal = false;
-                            //todo 向api请求修改
-                            if (1) //api返回条件
-                            {
-                                this.form = [];
-                                this.$Message.success('添加成功');
-                            }
-                            else {
-                                this.$Message.error('添加失败-');
-                            }
-
-                        }, 500);
-                    }
-                    else {
-                        this.$Message.error('添加失败-请完善表单信息后重新提交');
-                    }
-                });
-            },
-            edit () {
-                this.loading = true;
-                this.$refs.edit_Form.validate((valid) => {
-                    if (valid) {
-                        setTimeout(() => {
-                            this.loading = false;
-                            this.edit_modal = false;
-                            //todo 向api请求修改
-                            
-                            if (1) //api返回条件
-                            {
-                                this.data[this.place].permission = this.form1.permission_array.join(",");
-                                this.$Message.success('修改成功');
-                            }
-                            else {
-                                this.$Message.error('修改失败');
-                            }
-                        }, 500);
-                    }
-                    else {
-                        this.$Message.error('修改失败-请完善表单后重新提交');
-                    }
-                });
-            },
-            del () {
-                this.loading = true;
-                setTimeout(() => {
-                    this.loading = false;
-                    this.del_modal = false;
-                    //todo 向api请求修改
-                    if (1) //api返回条件
-                    {
-                        this.data.splice(this.place, 1);
-                        this.$Message.success('删除成功');
-                    }
-                    else {
-                        this.$Message.error('删除失败');
-                    }
-                }, 500);
-            }
+            this.table_total = this.serverdata.datalength;
+            this.changepage(1);
         }
     };
 </script>

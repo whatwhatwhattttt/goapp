@@ -1,5 +1,5 @@
 <style lang="less">
-    @import './../system-management.less';
+    @import './system-management.less';
 </style>
 <template>
     <div>
@@ -18,11 +18,16 @@
             </Col>
         </Row>
         <Row>
-            <Table border :columns="columns" :data="data"></Table>
-            <div style="text-align: center;">
-                <Page :total="100" :current="1" @on-change="changePage"></Page>
+            <Table border :loading="loading" :columns="columns" :data="data"></Table>
+            <div style="text-align: center">
+                <Page
+                        :total=table_total
+                        :current=1
+                        showTotal
+                        show-elevator
+                        @on-change="changepage">
+                </Page>
             </div>
-
         </Row>
         <Modal v-model="add_modal"
                :loading="loading"
@@ -113,13 +118,15 @@
 </template>
 <script>
     export default {
-
         data () {
             return {
                 add_modal: false,
                 edit_modal: false,
                 del_modal: false,
                 loading: false,
+                table_total: null,
+                current_page: 1,
+                older_page: 1,
                 place: null,
                 //todo 向api请求角色数组
                 createrole: ['1', '2', '3', '4'],
@@ -162,6 +169,11 @@
                     ]
                 },
                 columns: [
+                    {
+                        title: '索引',
+                        width: 100,
+                        type: 'index'
+                    },
                     {
                         title: '姓名',
                         width: 150,
@@ -243,7 +255,123 @@
                         }
                     }
                 ],
+                data: [],
+                serverdata: []
+            };
+        },
+        methods: {
+            // todo 分页操作
+            // index为页数
+            changepage(index){
+                this.loading = true;
+                this.current_page = index;
+                this.data = [];
+                let current_page_int = parseInt(this.current_page / 10);
+                let older_page_int = parseInt(this.older_page / 10);
+                let fstart = (this.current_page - 1) * 10;
+                let fend = this.current_page * 10 < this.table_total ? this.current_page * 10 : this.table_total;
+                setTimeout(() => {
+                    if (current_page_int != older_page_int) {
+                        // todo 向api请求选中页及附近9页数据
+                        this.older_page = this.current_page;
+                    }
+                    for (let i = fstart; i < fend; i++) {
+                        this.data.push(this.serverdata.data[i]);
+                    }
+                    this.loading = false;
+                }, 500);
+            },
+            add () {
+                this.loading = true;
+                this.$refs.add_Form.validate((valid) => {
+                    if (valid) {
+                        setTimeout(() => {
+                            this.loading = false;
+                            this.add_modal = false;
+                            //todo 向api请求插入员工数据
+
+                            if (1)//返回值判断
+                            {
+                                this.form = [];
+                                this.$Message.success('添加成功');
+                            }
+                            else {
+                                this.$Message.error('添加失败');
+                            }
+                        }, 500);
+                    }
+                    else {
+                        this.$Message.error('添加失败-请完善表单信息后重新提交');
+                    }
+                });
+            },
+            edit () {
+                this.loading = true;
+                this.$refs.edit_Form.validate((valid) => {
+                    if (valid) {
+                        setTimeout(() => {
+                            this.loading = false;
+                            this.edit_modal = false;
+                            //todo 修改api员工数据
+
+                            if (1)//判断api返回值
+                            {
+                                this.data[this.place].role = this.form1.role_array.join(",");
+                                this.$Message.success('修改成功');
+                            }
+                            else {
+                                this.$Message.error('修改失败');
+                            }
+                        }, 500);
+                    }
+                });
+            },
+            del () {
+                this.loading = true;
+                setTimeout(() => {
+                    this.loading = false;
+                    this.del_modal = false;
+                    //todo 从api删除当前员工
+                    if (1)//判断api返回值
+                    {
+                        this.data.splice(this.place, 1);
+                        this.$Message.success('删除成功');
+                    }
+                    else {
+                        this.$Message.error('删除失败');
+                    }
+                }, 500);
+
+            }
+        },
+        mounted () {
+            // todo 向api请求100条初始数据并放入serverdata
+            this.serverdata = {
+                //以下为数据格式
+                //数据库中该表共有数据条数
+                datalength: 7,
+                //100条初始数据
                 data: [
+                    {
+                        name: 'John Brown',
+                        age: 18,
+                        job_number: 'New York No. 1 Lake Park',
+                        position: '仓库管理',
+                        role: '1,2',
+                        role_array: ['1', '2'],
+                        admin_id: '123123',
+                        password: '123234123'
+                    },
+                    {
+                        name: 'John Brown',
+                        age: 18,
+                        job_number: 'New York No. 1 Lake Park',
+                        position: '仓库管理',
+                        role: '1,2',
+                        role_array: ['1', '2'],
+                        admin_id: '123123',
+                        password: '123234123'
+                    },
                     {
                         name: 'John Brown',
                         age: 18,
@@ -319,7 +447,7 @@
                     },
                     {
                         name: 'John Brown',
-                        age: 18,
+                        age: 123123,
                         job_number: 'New York No. 1 Lake Park',
                         position: '仓库管理',
                         role: '仓库管理',
@@ -337,75 +465,8 @@
                     }
                 ]
             };
-        },
-        methods: {
-//            todo 分页操作
-//            pagechange(){
-//
-//            },
-            add () {
-                this.loading = true;
-                this.$refs.add_Form.validate((valid) => {
-                    if (valid) {
-                        setTimeout(() => {
-                            this.loading = false;
-                            this.add_modal = false;
-                            //todo 向api插入员工数据
-
-                            if (1)//返回值判断
-                            {
-                                this.form = [];
-                                this.$Message.success('添加成功');
-                            }
-                            else {
-                                this.$Message.error('添加失败');
-                            }
-                        }, 500);
-                    }
-                    else {
-                        this.$Message.error('添加失败-请完善表单信息后重新提交');
-                    }
-                });
-            },
-            edit () {
-                this.loading = true;
-                this.$refs.edit_Form.validate((valid) => {
-                    if (valid) {
-                        setTimeout(() => {
-                            this.loading = false;
-                            this.edit_modal = false;
-                            //todo 修改api员工数据
-
-                            if (1)//判断api返回值
-                            {
-                                this.data[this.place].role = this.form1.role_array.join(",");
-                                this.$Message.success('修改成功');
-                            }
-                            else {
-                                this.$Message.error('修改失败');
-                            }
-                        }, 500);
-                    }
-                });
-            },
-            del () {
-                this.loading = true;
-                setTimeout(() => {
-                    this.loading = false;
-                    this.del_modal = false;
-                    //todo 从api删除当前员工
-                    if (1)//判断api返回值
-                    {
-                        this.data.splice(this.place, 1);
-                        this.$Message.success('删除成功');
-                    }
-                    else {
-                        this.$Message.error('删除失败');
-                    }
-                }, 500);
-
-            }
-
+            this.table_total = this.serverdata.datalength;
+            this.changepage(1);
         }
     };
 </script>
