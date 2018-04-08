@@ -1,5 +1,5 @@
 <style lang="less">
-    @import './../system-management.less';
+    @import './system-management.less';
 </style>
 <template>
     <div>
@@ -18,9 +18,15 @@
             </Col>
         </Row>
         <Row>
-            <Table border :columns="columns" :data="data"></Table>
-            <div style="text-align: center;">
-                <Page :total="100" :current="1" @on-change="changePage"></Page>
+            <Table border :loading="loading" :columns="columns" :data="data"></Table>
+            <div style="text-align: center">
+                <Page
+                        :total=table_total
+                        :current=1
+                        showTotal
+                        show-elevator
+                        @on-change="changepage">
+                </Page>
             </div>
         </Row>
         <Modal v-model="add_modal"
@@ -77,17 +83,18 @@
                 edit_modal: false,
                 del_modal: false,
                 loading: false,
+                table_total: null,
+                current_page: 1,
+                older_page: 1,
                 place: null,
                 form: {
                     name: '',
                     description: ''
-                }
-                ,
+                },
                 form1: {
                     name: '',
                     description: ''
-                }
-                ,
+                },
                 rules: {
                     name: [
                         {required: true, message: '权限名不能为空', trigger: 'blur'}
@@ -95,8 +102,7 @@
                     description: [
                         {required: true, message: '说明不能为空', trigger: 'blur'}
                     ]
-                }
-                ,
+                },
                 columns: [
                     {
                         title: '权限名',
@@ -138,7 +144,7 @@
                                     on: {
                                         click: () => {
                                             this.place = params.index;
-                                            this.del_modal=true;
+                                            this.del_modal = true;
                                         }
                                     }
                                 }, '删除')
@@ -146,44 +152,33 @@
                         }
                     }
                 ],
-                data: [
-                    {
-                        name: '123123',
-                        description: '123234123'
-                    },
-                    {
-                        name: '123123',
-                        description: '123234123'
-                    },
-                    {
-                        name: '123123',
-                        description: '123234123'
-                    },
-                    {
-                        name: '123123',
-                        description: '123234123'
-                    },
-                    {
-                        name: '123123',
-                        description: '123234123'
-                    },
-                    {
-                        name: '123123',
-                        description: '123234123'
-                    },
-                    {
-                        name: '123123',
-                        description: '123234123'
-                    },
-                ]
+                data: [],
+                serverdata: []
             }
                 ;
         },
         methods: {
-//            todo 分页操作
-//            pagechange(){
-//
-//            },
+            // todo 分页操作
+            // index为页数
+            changepage(index){
+                this.loading = true;
+                this.current_page = index;
+                this.data = [];
+                let current_page_int = parseInt(this.current_page / 10);
+                let older_page_int = parseInt(this.older_page / 10);
+                let fstart = (this.current_page - 1) * 10;
+                let fend = this.current_page * 10 < this.table_total ? this.current_page * 10 : this.table_total;
+                setTimeout(() => {
+                    if (current_page_int != older_page_int) {
+                        // todo 向api请求选中页及附近9页数据
+                        this.older_page = this.current_page;
+                    }
+                    for (let i = fstart; i < fend; i++) {
+                        this.data.push(this.serverdata.data[i]);
+                    }
+                    this.loading = false;
+                }, 500);
+            },
             add () {
                 this.loading = true;
                 this.$refs.add_Form.validate((valid) => {
@@ -246,6 +241,45 @@
                     }
                 }, 500);
             }
+        },
+        mounted () {
+            // todo 向api请求100条初始数据并放入serverdata
+            this.serverdata = {
+                //以下为数据格式
+                //数据库中该表共有数据条数
+                datalength: 7,
+                //100条初始数据
+                data: [{
+                    name: '123123',
+                    description: '123234123'
+                },
+                    {
+                        name: '123123',
+                        description: '123234123'
+                    },
+                    {
+                        name: '123123',
+                        description: '123234123'
+                    },
+                    {
+                        name: '123123',
+                        description: '123234123'
+                    },
+                    {
+                        name: '123123',
+                        description: '123234123'
+                    },
+                    {
+                        name: '123123',
+                        description: '123234123'
+                    },
+                    {
+                        name: '123123',
+                        description: '123234123'
+                    }]
+            };
+            this.table_total = this.serverdata.datalength;
+            this.changepage(1);
         }
     };
 </script>

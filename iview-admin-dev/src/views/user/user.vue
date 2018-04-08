@@ -15,9 +15,15 @@
             </Col>
         </Row>
         <Row>
-            <Table border :columns="columns" :data="data"></Table>
-            <div style="text-align: center;">
-                <Page :total="100" :current="1" @on-change="changePage"></Page>
+            <Table border :loading="loading" :columns="columns" :data="data"></Table>
+            <div style="text-align: center">
+                <Page
+                        :total=table_total
+                        :current=1
+                        showTotal
+                        show-elevator
+                        @on-change="changepage">
+                </Page>
             </div>
         </Row>
         <Modal v-model="edit_modal"
@@ -73,239 +79,274 @@
     </div>
 </template>
 <script>
-  import expandRow from './user-table-expand.vue';
-  export default {
-    components: {expandRow},
-    data () {
-      return {
-        edit_modal: false,
-        del_modal: false,
-        loading: false,
-        place: null,
-        form: {
-        },
-        rules: {
-          mobile_phone: [
-            {required: true, message: '账号不能为空', trigger: 'blur'},
-            {min: 6, max: 16, message: '密码在6-16位之间', trigger: 'blur'}
-          ],
-          password: [
-            {required: true, message: '密码不能为空', trigger: 'blur'},
-            {min: 6, max: 16, message: '密码在6-16位之间', trigger: 'blur'}
-          ]
-        },
-        columns: [
-          {
-            type: 'expand',
-            width: 50,
-            render: (h, params) => {
-              return h(expandRow, {
-                props: {
-                  row: params.row
-                }
-              })
-            }
-          },
-          {
-            title: '账号',
-            key: 'mobile_phone'
-          },
-          {
-            title: '昵称',
-            key: 'nicknickname'
-          },
-          {
-            title: '性别',
-            key: 'gander'
-          },
-          {
-            title: '年龄',
-            key: 'age'
-          },
-          {
-            title: 'Action',
-            key: 'action',
-            width: 150,
-            align: 'center',
-            render: (h, params) => {
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this.place = params.index;
-                      this.form = this.data[params.index];
-                      this.edit_modal = true;
+    import expandRow from './user-table-expand.vue';
+    export default {
+        components: {expandRow},
+        data () {
+            return {
+                edit_modal: false,
+                del_modal: false,
+                loading: false,
+                table_total: null,
+                current_page: 1,
+                older_page: 1,
+                place: null,
+                form: {},
+                rules: {
+                    mobile_phone: [
+                        {required: true, message: '账号不能为空', trigger: 'blur'},
+                        {min: 6, max: 16, message: '密码在6-16位之间', trigger: 'blur'}
+                    ],
+                    password: [
+                        {required: true, message: '密码不能为空', trigger: 'blur'},
+                        {min: 6, max: 16, message: '密码在6-16位之间', trigger: 'blur'}
+                    ]
+                },
+                columns: [
+                    {
+                        type: 'expand',
+                        width: 50,
+                        render: (h, params) => {
+                            return h(expandRow, {
+                                props: {
+                                    row: params.row
+                                }
+                            })
+                        }
+                    },
+                    {
+                        title: '索引',
+                        width: 100,
+                        type: 'index'
+                    },
+                    {
+                        title: '账号',
+                        key: 'mobile_phone'
+                    },
+                    {
+                        title: '昵称',
+                        key: 'nicknickname'
+                    },
+                    {
+                        title: '性别',
+                        key: 'gander'
+                    },
+                    {
+                        title: '年龄',
+                        key: 'age'
+                    },
+                    {
+                        title: 'Action',
+                        key: 'action',
+                        width: 150,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.place = params.index;
+                                            this.form = this.data[params.index];
+                                            this.edit_modal = true;
+                                        }
+                                    }
+                                }, '修改'),
+                                h('Button', {
+                                    props: {
+                                        type: 'error',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.place = params.index;
+                                            this.del_modal = true;
+                                        }
+                                    }
+                                }, '删除')
+                            ]);
+                        }
                     }
-                  }
-                }, '修改'),
-                h('Button', {
-                  props: {
-                    type: 'error',
-                    size: 'small'
-                  },
-                  on: {
-                    click: () => {
-                      this.place = params.index;
-                      this.del_modal = true;
+                ],
+                data: [],
+                serverdata: []
+            };
+        },
+        methods: {
+            // todo 分页操作
+            // index为页数
+            changepage(index){
+                this.loading = true;
+                this.current_page = index;
+                this.data = [];
+                let current_page_int = parseInt(this.current_page / 10);
+                let older_page_int = parseInt(this.older_page / 10);
+                let fstart = (this.current_page - 1) * 10;
+                let fend = this.current_page * 10 < this.table_total ? this.current_page * 10 : this.table_total;
+                setTimeout(() => {
+                    if (current_page_int != older_page_int) {
+                        // todo 向api请求选中页及附近9页数据
+                        this.older_page = this.current_page;
                     }
-                  }
-                }, '删除')
-              ]);
+                    for (let i = fstart; i < fend; i++) {
+                        this.data.push(this.serverdata.data[i]);
+                    }
+                    this.loading = false;
+                }, 500);
+            },
+            edit () {
+                this.loading = true;
+                this.$refs.edit_Form.validate((valid) => {
+                    if (valid) {
+                        setTimeout(() => {
+                            this.loading = false;
+                            this.edit_modal = false;
+                            //todo 修改api用户数据
+
+                            if (1)//判断api返回值
+                            {
+                                this.$Message.success('修改成功');
+                            }
+                            else {
+                                this.$Message.error('修改失败');
+                            }
+                        }, 500);
+                    }
+                });
+            },
+            del () {
+                this.loading = true;
+                setTimeout(() => {
+                    this.loading = false;
+                    this.del_modal = false;
+                    //todo 从api删除当前用户
+                    if (1)//判断api返回值
+                    {
+                        this.data.splice(this.place, 1);
+                        this.$Message.success('修改成功');
+                    }
+                    else {
+                        this.$Message.error('修改失败');
+                    }
+                }, 500);
+
             }
-          }
-        ],
-        data: [
-          {
-            mobile_phone: '18072078275',
-            nicknickname: '哎呦我去',
-            gander: 'man',
-            age: '18',
-            realname: 'zxk',
-            mail: '475811666@qq.com',
-            qq: '475811666',
-            password: '123234123',
-            id_card: '33333333333333333333',
-            create_time: '2018-asd-22'
-          },
+        },
+        mounted () {
+            // todo 向api请求100条初始数据并放入serverdata
+            this.serverdata = {
+                //以下为数据格式
+                //数据库中该表共有数据条数
+                datalength: 8,
+                //100条初始数据
+                data: [
+                    {
+                        mobile_phone: '18072078275',
+                        nicknickname: '哎呦我去',
+                        gander: 'man',
+                        age: '18',
+                        realname: 'zxk',
+                        mail: '475811666@qq.com',
+                        qq: '475811666',
+                        password: '123234123',
+                        id_card: '33333333333333333333',
+                        create_time: '2018-asd-22'
+                    },
 
-          {
-            mobile_phone: '18072078275',
-            nicknickname: '哎呦我去',
-            gander: 'man',
-            age: '18',
-            realname: 'zxk',
-            mail: '475811666@qq.com',
-            qq: '475811666',
-            password: '123234123',
-            id_card: '33333333333333333333',
-            create_time: '2018-asd-22'
-          },
-          {
-            mobile_phone: '18072078275',
-            nicknickname: '哎呦我去',
-            gander: 'man',
-            age: '18',
-            realname: 'zxk',
-            mail: '475811666@qq.com',
-            qq: '475811666',
-            password: '123234123',
-            id_card: '33333333333333333333',
-            create_time: '2018-asd-22'
-          },
-          {
-            mobile_phone: '18072078275',
-            nicknickname: '哎呦我去',
-            gander: 'man',
-            age: '18',
-            realname: 'zxk',
-            mail: '475811666@qq.com',
-            qq: '475811666',
-            password: '123234123',
-            id_card: '33333333333333333333',
-            create_time: '2018-asd-22'
-          },
-          {
-            mobile_phone: '18072078275',
-            nicknickname: '哎呦我去',
-            gander: 'man',
-            age: '18',
-            realname: 'zxk',
-            mail: '475811666@qq.com',
-            qq: '475811666',
-            password: '123234123',
-            id_card: '33333333333333333333',
-            create_time: '2018-asd-22'
-          },
-          {
-            mobile_phone: '18072078275',
-            nicknickname: '哎呦我去',
-            gander: 'man',
-            age: '18',
-            realname: 'zxk',
-            mail: '475811666@qq.com',
-            qq: '475811666',
-            password: '123234123',
-            id_card: '33333333333333333333',
-            create_time: '2018-asd-22'
-          },
-          {
-            mobile_phone: '18072078275',
-            nicknickname: '哎呦我去',
-            gander: 'man',
-            age: '18',
-            realname: 'zxk',
-            mail: '475811666@qq.com',
-            qq: '475811666',
-            password: '123234123',
-            id_card: '33333333333333333333',
-            create_time: '2018-asd-22'
-          },
-          {
-            mobile_phone: '18072078275',
-            nicknickname: '哎呦我去',
-            gander: 'man',
-            age: '18',
-            realname: 'zxk',
-            mail: '475811666@qq.com',
-            qq: '475811666',
-            password: '123234123',
-            id_card: '33333333333333333333',
-            create_time: '2018-asd-22'
-          }
-        ]
-      }
-        ;
-    },
-    methods: {
-//            todo 分页操作
-//            pagechange(){
-//
-//            },
-      edit () {
-        this.loading = true;
-        this.$refs.edit_Form.validate((valid) => {
-          if (valid) {
-            setTimeout(() => {
-              this.loading = false;
-              this.edit_modal = false;
-              //todo 修改api用户数据
-
-              if (1)//判断api返回值
-              {
-                this.$Message.success('修改成功');
-              }
-              else {
-                this.$Message.error('修改失败');
-              }
-            }, 500);
-          }
-        });
-      },
-      del () {
-        this.loading = true;
-        setTimeout(() => {
-          this.loading = false;
-          this.del_modal = false;
-          //todo 从api删除当前用户
-          if (1)//判断api返回值
-          {
-            this.data.splice(this.place, 1);
-            this.$Message.success('修改成功');
-          }
-          else {
-            this.$Message.error('修改失败');
-          }
-        }, 500);
-
-      }
-
-    }
-  };
+                    {
+                        mobile_phone: '18072078275',
+                        nicknickname: '哎呦我去',
+                        gander: 'man',
+                        age: '18',
+                        realname: 'zxk',
+                        mail: '475811666@qq.com',
+                        qq: '475811666',
+                        password: '123234123',
+                        id_card: '33333333333333333333',
+                        create_time: '2018-asd-22'
+                    },
+                    {
+                        mobile_phone: '18072078275',
+                        nicknickname: '哎呦我去',
+                        gander: 'man',
+                        age: '18',
+                        realname: 'zxk',
+                        mail: '475811666@qq.com',
+                        qq: '475811666',
+                        password: '123234123',
+                        id_card: '33333333333333333333',
+                        create_time: '2018-asd-22'
+                    },
+                    {
+                        mobile_phone: '18072078275',
+                        nicknickname: '哎呦我去',
+                        gander: 'man',
+                        age: '18',
+                        realname: 'zxk',
+                        mail: '475811666@qq.com',
+                        qq: '475811666',
+                        password: '123234123',
+                        id_card: '33333333333333333333',
+                        create_time: '2018-asd-22'
+                    },
+                    {
+                        mobile_phone: '18072078275',
+                        nicknickname: '哎呦我去',
+                        gander: 'man',
+                        age: '18',
+                        realname: 'zxk',
+                        mail: '475811666@qq.com',
+                        qq: '475811666',
+                        password: '123234123',
+                        id_card: '33333333333333333333',
+                        create_time: '2018-asd-22'
+                    },
+                    {
+                        mobile_phone: '18072078275',
+                        nicknickname: '哎呦我去',
+                        gander: 'man',
+                        age: '18',
+                        realname: 'zxk',
+                        mail: '475811666@qq.com',
+                        qq: '475811666',
+                        password: '123234123',
+                        id_card: '33333333333333333333',
+                        create_time: '2018-asd-22'
+                    },
+                    {
+                        mobile_phone: '18072078275',
+                        nicknickname: '哎呦我去',
+                        gander: 'man',
+                        age: '18',
+                        realname: 'zxk',
+                        mail: '475811666@qq.com',
+                        qq: '475811666',
+                        password: '123234123',
+                        id_card: '33333333333333333333',
+                        create_time: '2018-asd-22'
+                    },
+                    {
+                        mobile_phone: '18072078275',
+                        nicknickname: '哎呦我去',
+                        gander: 'man',
+                        age: '18',
+                        realname: 'zxk',
+                        mail: '475811666@qq.com',
+                        qq: '475811666',
+                        password: '123234123',
+                        id_card: '33333333333333333333',
+                        create_time: '2018-asd-22'
+                    }
+                ]
+            };
+            this.table_total = this.serverdata.datalength;
+            this.changepage(1);
+        }
+    };
 </script>
