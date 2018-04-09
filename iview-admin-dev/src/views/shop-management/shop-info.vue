@@ -151,6 +151,7 @@
                 stop_modal: false,
                 operate_modal: false,
                 name: 'shop-info',
+                loading: false,
                 shopdata: {}
             };
         },
@@ -159,14 +160,18 @@
                 this.shopdata = this.$route.query;
             },
             run (state) {
-                if (state == 1) {
-                    // todo 向api请求使商店切换至运营状态
-                    this.shopdata.run = 1;
-                }
-                else {
-                    // todo 向api请求使商店切换至停业状态
-                    this.shopdata.run = 0;
-                }
+                this.loading = true;
+                setTimeout(() => {
+                    if (state == 1) {
+                        // todo 向api请求使商店切换至运营状态
+                        this.shopdata.run = 1;
+                    }
+                    else {
+                        // todo 向api请求使商店切换至停业状态
+                        this.shopdata.run = 0;
+                    }
+                    this.loading = false;
+                }, 500);
             }
         },
         mounted () {

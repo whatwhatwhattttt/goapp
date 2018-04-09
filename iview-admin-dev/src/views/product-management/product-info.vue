@@ -168,14 +168,19 @@
                 this.productdata = this.$route.query;
             },
             run (state) {
-                if (state == 1) {
-                    // todo 向api请求使产品切换至上架状态
-                    this.productdata.run = 1;
-                }
-                else {
-                    // todo 向api请求使产品切换至下架状态
-                    this.productdata.run = 0;
-                }
+                this.loading = true;
+                setTimeout(() => {
+                    if (state == 1) {
+                        // todo 向api请求使产品切换至上架状态
+                        this.productdata.run = 1;
+                    }
+                    else {
+                        // todo 向api请求使产品切换至下架状态
+                        this.productdata.run = 0;
+                    }
+                    this.loading = false;
+                }, 500);
+
             }
         },
         mounted () {

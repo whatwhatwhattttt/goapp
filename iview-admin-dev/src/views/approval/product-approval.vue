@@ -56,8 +56,8 @@
                 </FormItem>
             </Form>
             <div slot="footer" align="center">
-                <Button type="primary" @click="approval(1)">通过</Button>
-                <Button type="error" @click="approval(-1)">拒绝</Button>
+                <Button type="primary" :loading="loading" @click="approval(1)">通过</Button>
+                <Button type="error" :loading="loading" @click="approval(-1)">拒绝</Button>
             </div>
         </Modal>
     </div>
@@ -179,12 +179,12 @@
                             {
                                 this.data[this.place].state = '审核通过';
                                 this.data.splice(this.place, 1);
-                                this.$Message.success('已审核');
+                                this.$Message.success('已审核-审核通过');
                             }
                             else if (state == -1) {
                                 this.data[this.place].state = '审核未通过';
                                 this.data.splice(this.place, 1);
-                                this.$Message.success('已审核');
+                                this.$Message.success('已审核-审核未通过');
                             }
                             else {
                                 this.$Message.error('审核失败');

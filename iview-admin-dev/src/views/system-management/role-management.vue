@@ -48,7 +48,7 @@
                 </FormItem>
             </Form>
             <div slot="footer">
-                <Button type="primary" long @click="add">提交</Button>
+                <Button type="primary" :loading="loading" long @click="add">提交</Button>
             </div>
         </Modal>
         <Modal v-model="edit_modal"
@@ -70,17 +70,20 @@
                 </FormItem>
             </Form>
             <div slot="footer">
-                <Button type="primary" long @click="edit">确定修改</Button>
+                <Button type="primary" :loading="loading" long @click="edit">确定修改</Button>
             </div>
         </Modal>
         <Modal
                 v-model="del_modal"
-                :loading="loading"
-                @on-ok="del">
+                :loading="loading">
             <p style="color:#f60;text-align:center;font-size: 25px">
                 <Icon type="information-circled"></Icon>
                 <span>确定删除？</span>
             </p>
+            <div slot="footer">
+                <Button @click="del_modal=false">返回</Button>
+                <Button type="error" :loading="loading" @click="del">确定删除</Button>
+            </div>
         </Modal>
     </div>
 </template>
@@ -223,6 +226,7 @@
                         }, 500);
                     }
                     else {
+                        this.loading = false;
                         this.$Message.error('添加失败-请完善表单信息后重新提交');
                     }
                 });
@@ -247,6 +251,7 @@
                         }, 500);
                     }
                     else {
+                        this.loading = false;
                         this.$Message.error('修改失败-请完善表单后重新提交');
                     }
                 });

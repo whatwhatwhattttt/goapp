@@ -48,8 +48,8 @@
                 </FormItem>
             </Form>
             <div slot="footer" align="center">
-                <Button type="primary" @click="approval(1)">通过</Button>
-                <Button type="error" @click="approval(-1)">拒绝</Button>
+                <Button type="primary" :loading="loading" @click="approval(1)">通过</Button>
+                <Button type="error" :loading="loading" @click="approval(-1)">拒绝</Button>
             </div>
         </Modal>
     </div>
@@ -156,6 +156,37 @@
                     }
                     this.loading = false;
                 }, 500);
+            },
+            approval (state) {
+                //state的值是0（未审核） 1（通过）或-1（不通过）
+                this.loading = true;
+                this.$refs.approval_Form.validate((valid) => {
+                    if (valid) {
+                        setTimeout(() => {
+                            this.loading = false;
+                            this.approval_modal = false;
+                            //todo 请求api修改商铺审核表数据
+                            if (state == 1)//判断api返回值
+                            {
+                                this.data[this.place].state = '审核通过';
+                                //审核后在当前表中移除显示
+                                this.data.splice(this.place, 1);
+                                this.$Message.success('已审核-审核通过');
+                            }
+                            else if (state == -1) {
+                                this.data[this.place].state = '审核未通过';
+                                this.data.splice(this.place, 1);
+                                this.$Message.success('已审核-审核未通过');
+                            }
+                            else {
+                                this.$Message.error('审核失败');
+                            }
+                        }, 500);
+                    }
+                    else{
+                        this.loading = false;
+                    }
+                });
             }
         },
         mounted () {
