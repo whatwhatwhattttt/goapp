@@ -249,7 +249,25 @@ export const appRouter = [
                 path: 'index',
                 title: '交易管理',
                 name: 'transaction-management_index',
+                access: 1,
                 component: () => import('@/views/transaction-management/transaction-management.vue')
+            }
+        ]
+    },
+    {
+        path: '/data-graph',
+        icon: 'image',
+        name: 'data-graph',
+        title: '数据图',
+        access: 1,
+        component: Main,
+        children: [
+            {
+                path: 'index',
+                title: '数据图',
+                name: 'data-graph_index',
+                access: 1,
+                component: () => import('@/views/data-graph/data-graph.vue')
             }
         ]
     },
