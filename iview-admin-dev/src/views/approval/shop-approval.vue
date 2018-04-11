@@ -15,11 +15,16 @@
             </Col>
         </Row>
         <Row>
-            <Table border :columns="columns" :data="data"></Table>
-            <div style="text-align: center;">
-                <Page :total="100" :current="1" @on-change="changePage"></Page>
+            <Table border :loading="loading" :columns="columns" :data="data"></Table>
+            <div style="text-align: center">
+                <Page
+                        :total=table_total
+                        :current=1
+                        showTotal
+                        show-elevator
+                        @on-change="changepage">
+                </Page>
             </div>
-
         </Row>
         <Modal v-model="approval_modal"
                :loading="loading"
@@ -43,19 +48,21 @@
                 </FormItem>
             </Form>
             <div slot="footer" align="center">
-                <Button type="primary" @click="approval(1)">通过</Button>
-                <Button type="error" @click="approval(-1)">拒绝</Button>
+                <Button type="primary" :loading="loading" @click="approval(1)">通过</Button>
+                <Button type="error" :loading="loading" @click="approval(-1)">拒绝</Button>
             </div>
         </Modal>
     </div>
 </template>
 <script>
     export default {
-
         data () {
             return {
                 approval_modal: false,
                 loading: false,
+                table_total: null,
+                current_page: 1,
+                older_page: 1,
                 place: null,
                 form: {
                     name: '',
@@ -71,12 +78,18 @@
                 },
                 columns: [
                     {
+                        title: '索引',
+                        width: 100,
+                        type: 'index'
+                    },
+                    {
                         title: '商铺名称',
                         width: 150,
                         key: 'name'
                     },
                     {
                         title: '申请人',
+                        width: 150,
                         key: 'user_name'
                     },
                     {
@@ -118,6 +131,71 @@
                         }
                     }
                 ],
+                data: [],
+                serverdata: []
+            };
+        },
+        methods: {
+            // todo 分页操作
+            // index为页数
+            changepage(index){
+                this.loading = true;
+                this.current_page = index;
+                this.data = [];
+                let current_page_int = parseInt(this.current_page / 10);
+                let older_page_int = parseInt(this.older_page / 10);
+                let fstart = (this.current_page - 1) * 10;
+                let fend = this.current_page * 10 < this.table_total ? this.current_page * 10 : this.table_total;
+                setTimeout(() => {
+                    if (current_page_int != older_page_int) {
+                        // todo 向api请求选中页及附近9页数据
+                        this.older_page = this.current_page;
+                    }
+                    for (let i = fstart; i < fend; i++) {
+                        this.data.push(this.serverdata.data[i]);
+                    }
+                    this.loading = false;
+                }, 500);
+            },
+            approval (state) {
+                //state的值是0（未审核） 1（通过）或-1（不通过）
+                this.loading = true;
+                this.$refs.approval_Form.validate((valid) => {
+                    if (valid) {
+                        setTimeout(() => {
+                            this.loading = false;
+                            this.approval_modal = false;
+                            //todo 请求api修改商铺审核表数据
+                            if (state == 1)//判断api返回值
+                            {
+                                this.data[this.place].state = '审核通过';
+                                //审核后在当前表中移除显示
+                                this.data.splice(this.place, 1);
+                                this.$Message.success('已审核-审核通过');
+                            }
+                            else if (state == -1) {
+                                this.data[this.place].state = '审核未通过';
+                                this.data.splice(this.place, 1);
+                                this.$Message.success('已审核-审核未通过');
+                            }
+                            else {
+                                this.$Message.error('审核失败');
+                            }
+                        }, 500);
+                    }
+                    else{
+                        this.loading = false;
+                    }
+                });
+            }
+        },
+        mounted () {
+            // todo 向api请求100条初始数据并放入serverdata
+            this.serverdata = {
+                //以下为数据格式
+                //数据库中该表共有数据条数
+                datalength: 7,
+                //100条初始数据
                 data: [
                     {
                         name: 'John Brown',
@@ -177,41 +255,8 @@
                     }
                 ]
             };
-        },
-        methods: {
-//            todo 分页操作
-//            pagechange(){
-//
-//            },
-            approval (state) {
-                //state的值是0（未审核） 1（通过）或-1（不通过）
-                this.loading = true;
-                this.$refs.approval_Form.validate((valid) => {
-                    if (valid) {
-                        setTimeout(() => {
-                            this.loading = false;
-                            this.approval_modal = false;
-                            //todo 请求api修改商铺审核表数据
-
-                            if (state == 1)//判断api返回值
-                            {
-                                this.data[this.place].state = '审核通过';
-                                //审核后在当前表中移除显示
-                                this.data.splice(this.place, 1);
-                                this.$Message.success('已审核');
-                            }
-                            else if (state == -1) {
-                                this.data[this.place].state = '审核未通过';
-                                this.data.splice(this.place, 1);
-                                this.$Message.success('已审核');
-                            }
-                            else {
-                                this.$Message.error('审核失败');
-                            }
-                        }, 500);
-                    }
-                });
-            }
+            this.table_total = this.serverdata.datalength;
+            this.changepage(1);
         }
     };
 </script>

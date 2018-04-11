@@ -20,51 +20,17 @@
             </Col>
         </Row>
         <Row>
-            <Table border :columns="columns" :data="data"></Table>
-            <div style="text-align: center;">
-                <Page :total="100" :current="1" @on-change="changePage"></Page>
+            <Table border :loading="loading" :columns="columns" :data="data"></Table>
+            <div style="text-align: center">
+                <Page
+                        :total=table_total
+                        :current=1
+                        showTotal
+                        show-elevator
+                        @on-change="changepage">
+                </Page>
             </div>
-
         </Row>
-        <!--以下为输入模板案例-->
-        <!--<Modal v-model="del_modal"-->
-               <!--:loading="loading"-->
-               <!--title="添加新员工">-->
-            <!--<Form ref="del_Form" :label-width="70" :model="form" :rules="rules">-->
-                <!--<FormItem label="账号" prop="admin_id">-->
-                    <!--<Input type="text" v-model="form.admin_id" class="log-text"-->
-                           <!--placeholder="输入员工账号"/><br>-->
-                <!--</FormItem>-->
-                <!--<FormItem label="密码" prop="password">-->
-                    <!--<Input type="text" v-model="form.password" class="log-text"-->
-                           <!--placeholder="输入员工密码"/><br>-->
-                <!--</FormItem>-->
-                <!--<FormItem label="姓名" prop="name">-->
-                    <!--<Input type="text" v-model="form.name" class="log-text"-->
-                           <!--placeholder="输入员工姓名"/><br>-->
-                <!--</FormItem>-->
-                <!--<FormItem label="年龄" prop="age">-->
-                    <!--<Input type="text" v-model="form.age" class="log-text"-->
-                           <!--placeholder="输入员工年龄"/><br>-->
-                <!--</FormItem>-->
-                <!--<FormItem label="工号" prop="job_number">-->
-                    <!--<Input type="text" v-model="form.job_number" class="log-text"-->
-                           <!--placeholder="输入员工工号"/><br>-->
-                <!--</FormItem>-->
-                <!--<FormItem label="职位" prop="position">-->
-                    <!--<Input type="text" v-model="form.position" class="log-text"-->
-                           <!--placeholder="输入员工职位"/><br>-->
-                <!--</FormItem>-->
-                <!--<FormItem label="角色">-->
-                    <!--<CheckboxGroup v-model="form.role_array">-->
-                        <!--<Checkbox v-for="item in createrole" :label=item></Checkbox>-->
-                    <!--</CheckboxGroup>-->
-                <!--</FormItem>-->
-            <!--</Form>-->
-            <!--<div slot="footer">-->
-                <!--<Button type="primary" long @click="add">提交</Button>-->
-            <!--</div>-->
-        <!--</Modal>-->
     </div>
 </template>
 <script>
@@ -74,6 +40,9 @@
             return {
                 del_modal: false,
                 loading: false,
+                table_total: null,
+                current_page: 1,
+                older_page: 1,
                 form: {
                     admin_id: '',
                     password: '',
@@ -104,6 +73,11 @@
                 },
                 columns: [
                     {
+                        title: '索引',
+                        width: 100,
+                        type: 'index'
+                    },
+                    {
                         title: '姓名',
                         width: 150,
                         key: 'name'
@@ -130,6 +104,40 @@
                         key: 'time'
                     }
                 ],
+                data: [],
+                serverdata: []
+            };
+        },
+        methods: {
+            // todo 分页操作
+            // index为页数
+            changepage(index){
+                this.loading = true;
+                this.current_page = index;
+                this.data = [];
+                let current_page_int = parseInt(this.current_page / 10);
+                let older_page_int = parseInt(this.older_page / 10);
+                let fstart = (this.current_page - 1) * 10;
+                let fend = this.current_page * 10 < this.table_total ? this.current_page * 10 : this.table_total;
+                setTimeout(() => {
+                    if (current_page_int != older_page_int) {
+                        // todo 向api请求选中页及附近9页数据
+                        this.older_page = this.current_page;
+                    }
+                    for (let i = fstart; i < fend; i++) {
+                        this.data.push(this.serverdata.data[i]);
+                    }
+                    this.loading = false;
+                }, 500);
+            }
+        },
+        mounted () {
+            // todo 向api请求100条初始数据并放入serverdata
+            this.serverdata = {
+                //以下为数据格式
+                //数据库中该表共有数据条数
+                datalength: 7,
+                //100条初始数据
                 data: [
                     {
                         name: 'John Brown',
@@ -195,39 +203,10 @@
                         description: ['1', '2'],
                         time: '123123'
                     },
-
                 ]
             };
-        },
-        methods: {
-//            todo 分页操作
-//            pagechange(){
-//
-//            },
-//            del () {
-//                this.loading = true;
-//                this.$refs.del_Form.validate((valid) => {
-//                    if (valid) {
-//                        setTimeout(() => {
-//                            this.loading = false;
-//                            this.del_modal = false;
-//                            //todo 向api插入员工数据
-//
-//                            if (1)//返回值判断
-//                            {
-//                                this.form = [];
-//                                this.$Message.success('添加成功');
-//                            }
-//                            else {
-//                                this.$Message.error('添加失败');
-//                            }
-//                        }, 500);
-//                    }
-//                    else {
-//                        this.$Message.error('添加失败-请完善表单信息后重新提交');
-//                    }
-//                });
-//            }
+            this.table_total = this.serverdata.datalength;
+            this.changepage(1);
         }
     };
 </script>

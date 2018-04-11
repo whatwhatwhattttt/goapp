@@ -19,11 +19,16 @@
             </Col>
         </Row>
         <Row>
-            <Table border :columns="columns" :data="data"></Table>
-            <div style="text-align: center;">
-                <Page :total="100" :current="1" @on-change="changePage"></Page>
+            <Table border :loading="loading" :columns="columns" :data="data"></Table>
+            <div style="text-align: center">
+                <Page
+                        :total=table_total
+                        :current=1
+                        showTotal
+                        show-elevator
+                        @on-change="changepage">
+                </Page>
             </div>
-
         </Row>
     </div>
 </template>
@@ -31,8 +36,16 @@
     export default {
         data () {
             return {
+                table_total: null,
+                current_page: 1,
+                older_page: 1,
                 place: null,
                 columns: [
+                    {
+                        title: '索引',
+                        width: 100,
+                        type: 'index'
+                    },
                     {
                         title: '交易编号',
                         key: 'id'
@@ -75,6 +88,47 @@
                         }
                     }
                 ],
+                data: [],
+                serverdata: []
+            };
+        },
+        methods: {
+            // todo 分页操作
+            // index为页数
+            changepage(index){
+                this.loading = true;
+                this.current_page = index;
+                this.data = [];
+                let current_page_int = parseInt(this.current_page / 10);
+                let older_page_int = parseInt(this.older_page / 10);
+                let fstart = (this.current_page - 1) * 10;
+                let fend = this.current_page * 10 < this.table_total ? this.current_page * 10 : this.table_total;
+                setTimeout(() => {
+                    if (current_page_int != older_page_int) {
+                        // todo 向api请求选中页及附近9页数据
+                        this.older_page = this.current_page;
+                    }
+                    for (let i = fstart; i < fend; i++) {
+                        this.data.push(this.serverdata.data[i]);
+                    }
+                    this.loading = false;
+                }, 500);
+            },
+            showinfo () {
+                let query = this.data[this.place];
+                this.$router.push({
+                    name: 'transactioninfo',
+                    query: query
+                });
+            }
+        },
+        mounted () {
+            // todo 向api请求100条初始数据并放入serverdata
+            this.serverdata = {
+                //以下为数据格式
+                //数据库中该表共有数据条数
+                datalength: 1,
+                //100条初始数据
                 data: [
                     {
                         // 交易编号
@@ -108,18 +162,8 @@
                     }
                 ]
             };
-        },
-        methods: {
-            // todo 分页操作
-            // pagechange(){
-            // },
-            showinfo () {
-                let query = this.data[this.place];
-                this.$router.push({
-                    name: 'transactioninfo',
-                    query: query
-                });
-            }
+            this.table_total = this.serverdata.datalength;
+            this.changepage(1);
         }
     };
 </script>
