@@ -11,23 +11,23 @@
                     欢迎登录
                 </p>
                 <div class="form-con">
-                    <Form ref="loginForm" :model="form" :rules="rules">
+                    <Form ref="loginForm" :model="loginForm" :rules="loginRules">
                         <FormItem prop="admin_id">
-                            <Input v-model="form.admin_id" placeholder="请输入用户名">
+                            <Input v-model="loginForm.admin_id" placeholder="请输入用户名">
                             <span slot="prepend">
                                     <Icon :size="16" type="person"></Icon>
                                 </span>
                             </Input>
                         </FormItem>
                         <FormItem prop="password">
-                            <Input type="password" v-model="form.password" placeholder="请输入密码">
+                            <Input type="password" v-model="loginForm.password" placeholder="请输入密码">
                             <span slot="prepend">
                                     <Icon :size="14" type="locked"></Icon>
                                 </span>
                             </Input>
                         </FormItem>
                         <FormItem>
-                            <Button @click="handleSubmit" type="primary" long>登录</Button>
+                            <Button @click="handleSubmit()" type="primary" long>登录</Button>
                         </FormItem>
                     </Form>
                     <p class="login-tip">输入任意用户名和密码即可</p>
@@ -39,14 +39,16 @@
 
 <script>
     import Cookies from 'js-cookie';
+    import { doLogin } from '../libs/vueHelper'
     export default {
+        name:"login",
         data () {
             return {
-                form: {
-                    admin_id: 'iview_admin',
-                    password: ''
+                loginForm: {
+                    admin_id: 'adminzwq',
+                    password: '123456'
                 },
-                rules: {
+                loginRules: {
                     admin_id: [
                         {required: true, message: '账号不能为空', trigger: 'blur'},
                         {max: 16, message: '账号应小于16个字符', trigger: 'blur'}
@@ -59,31 +61,16 @@
             };
         },
         methods: {
-            checkLogin(){
-                //检查是否存在session
-                //cookie操作方法在源码里有或者参考网上的即可
-                if (!this.getCookie('session')) {
-                    //如果没有登录状态则跳转到登录页
-                    this.$router.push('/login');
-                } else {
-                    //否则跳转到登录后的页面
-                    this.$router.push('/user_info');
-                }
-            },
             handleSubmit (){
                 this.$refs.loginForm.validate((valid) => {
                     if (valid) {
-                        Cookies.set('user', this.form.admin_id);
-                        Cookies.set('password', this.form.password);
-                        this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
-                        if (this.form.admin_id === 'iview_admin') {
-                            Cookies.set('access', 1);
-                        } else {
-                            Cookies.set('access', 0);
+                        let data = {
+                            'usr': this.loginForm.admin_id,
+                            'pwd': this.loginForm.password
                         }
-                        this.$router.push({
-                            name: 'home_index'
-                        });
+                        doLogin(this, data)
+                    } else {
+                        return false
                     }
                 });
             }

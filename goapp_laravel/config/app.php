@@ -167,7 +167,7 @@ return [
         /*
          * Package Service Providers...
          */
-
+        Naux\Mail\SendCloudServiceProvider::class,//邮箱认证
         /*
          * Application Service Providers...
          */
