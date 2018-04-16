@@ -12,7 +12,7 @@
                     <p class="pay-title-color">支付管理</p>
                     </Col>
                     <Col span="3" offset="5">
-                    <Button @click="add_modal=true" long>添加模板</Button>
+                    <Button @click="add_modal=true" long>添加方案</Button>
                     </Col>
                 </Row>
             </card>
@@ -23,7 +23,7 @@
                 <Col span="24">
                 <Row>
                     <Col class="pay-text" span="4">
-                    <span>已启用模板>>>>>></span>
+                    <span>已启用方案>>>>>></span>
                     </Col>
 
                     <Col span="9">
@@ -56,7 +56,7 @@
         </Row>
         <Modal v-model="add_modal"
                :loading="loading"
-               title="添加模板">
+               title="添加方案">
             <Form ref="pay_add_Form" :label-width="80" :model="form" :rules="rules">
                 <FormItem label="微信" prop="wechat">
                     <Input type="text" v-model="form.wechat" class="pay-text"
@@ -73,7 +73,7 @@
         </Modal>
         <Modal v-model="edit_modal"
                :loading="loading"
-               title="模板修改">
+               title="方案修改">
             <Form ref="edit_Form" :label-width="80" :model="form1" :rules="rules">
                 <FormItem label="微信" prop="wechat">
                     <Input type="text" v-model="form1.wechat" class="pay-text"
@@ -352,7 +352,7 @@
                 setTimeout(() => {
                     this.loading = false;
                     this.use_modal = false;
-                    //todo 数据库修改正在使用的模板
+                    //todo 数据库修改正在使用的方案
                     if (1) //api返回结果
                     {
                         this.tip = this.data[this.place];
@@ -368,7 +368,7 @@
                 setTimeout(() => {
                     this.loading = false;
                     this.del_modal = false;
-                    //todo 数据库删除当前模板
+                    //todo 数据库删除当前方案
 
                     if (1) //api返回结果
                     {
