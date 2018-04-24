@@ -3,31 +3,43 @@
 </style>
 <template>
     <div>
-        <Row>
-            <Col span="24">
+        <Row style="position:fixed;top:100px;z-index: 999;width:100%">
+            <Col span="21">
             <card>
                 <Row>
-                    <Col span="8" offset="9">
-                    <p class="system-title-color">数据宝贵请确认后再删除！</p>
+                    <Col span="3">
+                    <p class="system-title-color">角色管理</p>
                     </Col>
-                    <Col span="3" offset="3">
-                    <Button @click="add_modal=true" long>添加新角色</Button>
+
+                    <Col span="15" offset="5">
+                    <zxksearch :searchlist="searchlist" :loading="loading" @zxksearch_f="search"></zxksearch>
                     </Col>
                 </Row>
             </card>
             </Col>
         </Row>
-        <Row>
+        <Row style="margin-top: 68px;margin-bottom: 50px;">
             <Table border :loading="loading" :columns="columns" :data="data"></Table>
-            <div style="text-align: center">
-                <Page
-                        :total=table_total
-                        :current=1
-                        showTotal
-                        show-elevator
-                        @on-change="changepage">
-                </Page>
-            </div>
+        </Row>
+        <Row>
+            <Card style="position:fixed;bottom:0px;z-index: 999;width:100%;height: 60px;">
+                <Col span="10" offset="5">
+                <div style="text-align: center">
+                    <Page
+                            size="small"
+                            :total=table_total
+                            :current=1
+                            showTotal
+                            show-elevator
+                            @on-change="changepage">
+                    </Page>
+                </div>
+                </Col>
+
+                <Col span="3" offset="2">
+                <Button @click="add_modal=true" long>添加新角色</Button>
+                </Col>
+            </Card>
         </Row>
         <Modal v-model="add_modal"
                :loading="loading"
@@ -102,6 +114,11 @@
                 place: null,
                 //todo 向api请求权限数组
                 create_permission: ['1', '2', '3', '4'],
+                searchlist: [
+                    ['name', '角色名'],
+                    ['description', '角色说明'],
+                    ['permission', '拥有权限']
+                ],
                 form: {
                     name: '',
                     description: '',
@@ -181,30 +198,78 @@
                     }
                 ],
                 data: [],
-                serverdata: []
             };
         },
         methods: {
+            //初始化方法
+            init(){
+                // todo 向api请求100条初始数据并放入serverdata
+                this.serverdata = {
+                    //以下为数据格式
+                    //数据库中该表共有数据条数
+                    datalength: 6,
+                    //100条初始数据
+                    data: [
+                        {
+                            name: 'zzz',
+                            description: 'sdfsdf',
+                            permission: '1,2',
+                            permission_array: ['2', '3']
+                        },
+                        {
+                            name: 'fghfgj',
+                            description: 'dfhfghf',
+                            permission: '1,2',
+                            permission_array: ['2', '3']
+                        },
+                        {
+                            name: 'e5yrthfg',
+                            description: 'fdg434ythgfd',
+                            permission: '1,2',
+                            permission_array: ['2', '3']
+                        },
+                        {
+                            name: '35yhtreew',
+                            description: '5htrytegew',
+                            permission: '1,2',
+                            permission_array: ['2', '3']
+                        },
+                        {
+                            name: 'dse4rytbgesdxc',
+                            description: 'regsfd4e',
+                            permission: '1,2',
+                            permission_array: ['2', '3']
+                        },
+                        {
+                            name: 'w456yjnthrw',
+                            description: 'wrhetmh45jy456u6534',
+                            permission: '1,2',
+                            permission_array: ['2', '3']
+                        }
+                    ]
+                };
+                this.table_total = this.serverdata.datalength;
+                this.changepage(1);
+                this.dataload();
+            },
             // todo 分页操作
             // index为页数
             changepage(index){
                 this.loading = true;
                 this.current_page = index;
                 this.data = [];
-                let current_page_int = parseInt(this.current_page / 10);
-                let older_page_int = parseInt(this.older_page / 10);
                 let fstart = (this.current_page - 1) * 10;
                 let fend = this.current_page * 10 < this.table_total ? this.current_page * 10 : this.table_total;
                 setTimeout(() => {
-                    if (current_page_int != older_page_int) {
-                        // todo 向api请求选中页及附近9页数据
-                        this.older_page = this.current_page;
-                    }
                     for (let i = fstart; i < fend; i++) {
                         this.data.push(this.serverdata.data[i]);
                     }
                     this.loading = false;
                 }, 500);
+            },
+            //数据拉取
+            dataload(){
+                //todo 拉取所有数据
             },
             add () {
                 this.loading = true;
@@ -274,53 +339,7 @@
             }
         },
         mounted () {
-            // todo 向api请求100条初始数据并放入serverdata
-            this.serverdata = {
-                //以下为数据格式
-                //数据库中该表共有数据条数
-                datalength: 6,
-                //100条初始数据
-                data: [
-                    {
-                        name: 'zzz',
-                        description: 'sdfsdf',
-                        permission: '1,2',
-                        permission_array: ['2', '3']
-                    },
-                    {
-                        name: 'fghfgj',
-                        description: 'dfhfghf',
-                        permission: '1,2',
-                        permission_array: ['2', '3']
-                    },
-                    {
-                        name: 'e5yrthfg',
-                        description: 'fdg434ythgfd',
-                        permission: '1,2',
-                        permission_array: ['2', '3']
-                    },
-                    {
-                        name: '35yhtreew',
-                        description: '5htrytegew',
-                        permission: '1,2',
-                        permission_array: ['2', '3']
-                    },
-                    {
-                        name: 'dse4rytbgesdxc',
-                        description: 'regsfd4e',
-                        permission: '1,2',
-                        permission_array: ['2', '3']
-                    },
-                    {
-                        name: 'w456yjnthrw',
-                        description: 'wrhetmh45jy456u6534',
-                        permission: '1,2',
-                        permission_array: ['2', '3']
-                    }
-                ]
-            };
-            this.table_total = this.serverdata.datalength;
-            this.changepage(1);
+            this.init();
         }
     };
 </script>
