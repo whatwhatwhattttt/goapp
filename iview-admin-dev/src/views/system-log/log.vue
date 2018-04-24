@@ -3,33 +3,40 @@
 </style>
 <template>
     <div>
-        <Row>
-            <Col span="24">
+        <Row style="position:fixed;top:100px;z-index: 999;width:100%">
+            <Col span="21">
             <card>
                 <Row>
-                    <Col span="10" offset="7">
+                    <Col span="8">
                     <!--todo 每月自动清理功能留待后期完善-->
                     <p class="log-title-color">系统管理日志（每月初将自动清理两月前的日志）</p>
                     </Col>
-                    <!--todo 此处可添加详细查询之类的按钮并添加相应事件，待后期完善-->
-                    <!--<Col span="3" offset="3">-->
-                    <!--<Button @click="del_modal=true" long>日志清理</Button>-->
-                    <!--</Col>-->
+
+                    <Col span="10">
+                    <zxksearch :searchlist="searchlist" :loading="loading" @zxksearch_f="search"></zxksearch>
+                    </Col>
                 </Row>
             </card>
             </Col>
         </Row>
-        <Row>
+        <Row style="margin-top: 68px;margin-bottom: 50px;">
             <Table border :loading="loading" :columns="columns" :data="data"></Table>
-            <div style="text-align: center">
-                <Page
-                        :total=table_total
-                        :current=1
-                        showTotal
-                        show-elevator
-                        @on-change="changepage">
-                </Page>
-            </div>
+        </Row>
+        <Row>
+            <Card style="position:fixed;bottom:0px;z-index: 999;width:100%;height: 60px;">
+                <Col span="10" offset="5">
+                <div style="text-align: center">
+                    <Page
+                            size="small"
+                            :total=table_total
+                            :current=1
+                            showTotal
+                            show-elevator
+                            @on-change="changepage">
+                    </Page>
+                </div>
+                </Col>
+            </Card>
         </Row>
     </div>
 </template>
@@ -115,20 +122,18 @@
                 this.loading = true;
                 this.current_page = index;
                 this.data = [];
-                let current_page_int = parseInt(this.current_page / 10);
-                let older_page_int = parseInt(this.older_page / 10);
                 let fstart = (this.current_page - 1) * 10;
                 let fend = this.current_page * 10 < this.table_total ? this.current_page * 10 : this.table_total;
                 setTimeout(() => {
-                    if (current_page_int != older_page_int) {
-                        // todo 向api请求选中页及附近9页数据
-                        this.older_page = this.current_page;
-                    }
                     for (let i = fstart; i < fend; i++) {
                         this.data.push(this.serverdata.data[i]);
                     }
                     this.loading = false;
                 }, 500);
+            },
+            //数据拉取
+            dataload(){
+                //todo 拉取所有数据
             }
         },
         mounted () {
