@@ -4,59 +4,69 @@
 </style>
 <template>
     <div>
-        <Row>
-            <Col span="24">
+        <Row style="position:fixed;top:100px;z-index: 999;width:100%">
+            <Col span="21">
             <card>
                 <Row>
-                    <Col span="5" offset="10">
+                    <Col span="3">
                     <p class="pay-title-color">支付管理</p>
                     </Col>
-                    <Col span="3" offset="5">
-                    <Button @click="add_modal=true" long>添加模板</Button>
+
+                    <Col span="10" offset="5">
+                    <zxksearch :searchlist="searchlist" :loading="loading" @zxksearch_f="search"></zxksearch>
                     </Col>
                 </Row>
             </card>
             </Col>
         </Row>
-        <Row>
+        <Row style="position:fixed;top:167px;z-index: 999;width:100%">
             <card class="pay-tip">
-                <Col span="24">
+                <Col span="18">
                 <Row>
-                    <Col class="pay-text" span="4">
-                    <span>已启用模板>>>>>></span>
+                    <Col style="margin-top: 3px;" span="3" offset="1">
+                    <span>已启用方案:</span>
                     </Col>
 
-                    <Col span="9">
-                    <Input type="text" v-model="tip.wechat" readonly>
+                    <Col span="7">
+                    <Input type="text" style="width: 260px" v-model="tip.wechat" readonly>
                     <span slot="prepend">微信账号：</span>
                     </Input>
                     </Col>
 
-                    <Col span="9" offset="1">
-                    <Input type="text" v-model="tip.alipay" readonly>
+                    <Col span="7" offset="1">
+                    <Input type="text" style="width: 260px" v-model="tip.alipay" readonly>
                     <span slot="prepend">支付宝账号：</span>
                     </Input>
-
                     </Col>
                 </Row>
                 </Col>
             </card>
         </Row>
+        <Row style="margin-top: 128px;margin-bottom: 50px;">
+        <Table border :loading="loading" :columns="columns" :data="data"></Table>
+        </Row>
         <Row>
-            <Table border :loading="loading" :columns="columns" :data="data"></Table>
-            <div style="text-align: center">
-                <Page
-                        :total=table_total
-                        :current=1
-                        showTotal
-                        show-elevator
-                        @on-change="changepage">
-                </Page>
-            </div>
+            <Card style="position:fixed;bottom:0px;z-index: 999;width:100%;height: 60px;">
+                <Col span="10" offset="5">
+                <div style="text-align: center">
+                    <Page
+                            size="small"
+                            :total=table_total
+                            :current=1
+                            showTotal
+                            show-elevator
+                            @on-change="changepage">
+                    </Page>
+                </div>
+                </Col>
+                <Col span="3" offset="2">
+                <Button @click="add_modal=true" long>添加方案</Button>
+                </Col>
+            </Card>
         </Row>
         <Modal v-model="add_modal"
                :loading="loading"
-               title="添加模板">
+               title="添加方案">
             <Form ref="pay_add_Form" :label-width="80" :model="form" :rules="rules">
                 <FormItem label="微信" prop="wechat">
                     <Input type="text" v-model="form.wechat" class="pay-text"
@@ -68,12 +78,12 @@
                 </FormItem>
             </Form>
             <div slot="footer">
-                <Button type="primary" :loading="loading" long @click="pay_add">提交</Button>
+                <Button type="primary" :loading="loading" @click="add" long>提交</Button>
             </div>
         </Modal>
         <Modal v-model="edit_modal"
                :loading="loading"
-               title="模板修改">
+               title="方案修改">
             <Form ref="edit_Form" :label-width="80" :model="form1" :rules="rules">
                 <FormItem label="微信" prop="wechat">
                     <Input type="text" v-model="form1.wechat" class="pay-text"
@@ -119,20 +129,37 @@
     export default {
         data () {
             return {
+                //已启用方案显示用数据
                 tip: {
                     //todo 加载页面时自动向数据库请求并更改内部数据为正在使用的账号数据
                     wechat: '111',
                     alipay: '222'
                 },
+                //添加弹框显示变量
                 add_modal: false,
+                //修改弹框显示变量
                 edit_modal: false,
+                //启用弹框显示变量
                 use_modal: false,
+                //删除弹框显示变量
                 del_modal: false,
+                //组件加载变量
                 loading: false,
+                //数据库中该类型总数据条数
                 table_total: null,
+                //跳转页码
                 current_page: 1,
+                //当前页码
                 older_page: 1,
+                //表格数据位置
                 place: null,
+                //搜索可选
+                searchlist: [
+                    ['wechat', '微信账号'],
+                    ['wechat_balance', '微信账号内资金'],
+                    ['alipay', '支付宝账号'],
+                    ['alipay_balance', '支付宝账号内资金']
+                ],
                 form: {
                     wechat: '',
                     alipay: ''
@@ -148,6 +175,9 @@
                     wechat: [
                         {required: true, message: '微信账号不能为空', trigger: 'blur'}
                     ],
+                    search_t: [
+                        {required: true, message: '微信账号不能为空', trigger: 'blur'}
+                    ]
                 },
                 columns: [
                     {
@@ -158,15 +188,21 @@
                     {
                         title: '微信账号',
                         key: 'wechat'
-                    }
-                    ,
+                    },
+                    {
+                        title: '微信账号内资金',
+                        key: 'wechat_balance'
+                    },
                     {
                         title: '支付宝账号',
                         key: 'alipay'
-                    }
-                    ,
+                    },
                     {
-                        title: 'Action',
+                        title: '支付宝账号内资金',
+                        key: 'alipay_balance'
+                    },
+                    {
+                        title: '操作',
                         key: 'action',
                         width: 200,
                         align: 'center',
@@ -219,84 +255,116 @@
                         }
                     }
                 ],
-                //todo 替换为接口数据
-                data: [
-                    {
-                        number: 7,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 8,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 9,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 0,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 1,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 2,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 3,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 4,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 5,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 6,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    }
-
-                ]
-            }
-                ;
+                data: []
+            };
         },
         methods: {
+            //初始化方法
+            init(){
+                // todo 向api请求100条初始数据并放入serverdata
+                this.serverdata = {
+                    //以下为数据格式
+                    //数据库中该表共有数据条数
+                    datalength: 12,
+                    //100条初始数据
+                    data: [
+                        {
+                            number: 7,
+                            wechat: '183424242423253345',
+                            alipay: '32524534345453434553',
+                        },
+                        {
+                            number: 8,
+                            wechat: '18',
+                            alipay: 'New York No. 1 Lake Park',
+                        },
+                        {
+                            number: 9,
+                            wechat: '18',
+                            alipay: 'New York No. 1 Lake Park',
+                        },
+                        {
+                            number: 0,
+                            wechat: '18',
+                            alipay: 'New York No. 1 Lake Park',
+                        },
+                        {
+                            number: 1,
+                            wechat: '18',
+                            alipay: 'New York No. 1 Lake Park',
+                        },
+                        {
+                            number: 2,
+                            wechat: '18',
+                            alipay: 'New York No. 1 Lake Park',
+                        },
+                        {
+                            number: 3,
+                            wechat: '18',
+                            alipay: 'New York No. 1 Lake Park',
+                        },
+                        {
+                            number: 4,
+                            wechat: '18',
+                            alipay: 'New York No. 1 Lake Park',
+                        },
+                        {
+                            number: 5,
+                            wechat: '18',
+                            alipay: 'New York No. 1 Lake Park',
+                        },
+                        {
+                            number: 6,
+                            wechat: '18',
+                            alipay: 'New York No. 1 Lake Park',
+                        },
+                        {
+                            number: 6,
+                            wechat: '18',
+                            alipay: 'New York No. 1 Lake Park',
+                        },
+                        {
+                            number: 6,
+                            wechat: '18',
+                            alipay: 'New York No. 1 Lake Park',
+                        }
+
+                    ]
+                };
+                this.table_total = this.serverdata.datalength;
+                this.changepage(1);
+                this.dataload();
+            },
+            //todo 搜索
+            search(index){
+                this.loading = true;
+                setTimeout(() => {
+                    if (index[0]) {
+                        // todo 向api发送字符串并返回匹配数据
+                        //this.serverdata=
+                        this.init();
+                    }
+                    this.loading = false;
+                }, 500);
+            },
             // todo 分页操作
             // index为页数
             changepage(index){
                 this.loading = true;
                 this.current_page = index;
                 this.data = [];
-                let current_page_int = parseInt(this.current_page / 10);
-                let older_page_int = parseInt(this.older_page / 10);
                 let fstart = (this.current_page - 1) * 10;
                 let fend = this.current_page * 10 < this.table_total ? this.current_page * 10 : this.table_total;
                 setTimeout(() => {
-                    if (current_page_int != older_page_int) {
-                        // todo 向api请求选中页及附近9页数据
-                        this.older_page = this.current_page;
-                    }
                     for (let i = fstart; i < fend; i++) {
                         this.data.push(this.serverdata.data[i]);
                     }
                     this.loading = false;
                 }, 500);
+            },
+            //数据拉取
+            dataload(){
+                //todo 拉取所有数据
             },
             add() {
                 this.loading = true;
@@ -352,7 +420,7 @@
                 setTimeout(() => {
                     this.loading = false;
                     this.use_modal = false;
-                    //todo 数据库修改正在使用的模板
+                    //todo 数据库修改正在使用的方案
                     if (1) //api返回结果
                     {
                         this.tip = this.data[this.place];
@@ -368,11 +436,12 @@
                 setTimeout(() => {
                     this.loading = false;
                     this.del_modal = false;
-                    //todo 数据库删除当前模板
+                    //todo 数据库删除当前方案
 
                     if (1) //api返回结果
                     {
                         this.data.splice(this.place, 1);
+                        this.table_total -= 1;
                         this.$Message.success('删除成功');
                     }
                     else {
@@ -383,68 +452,7 @@
         },
         mounted()
         {
-            // todo 向api请求100条初始数据并放入serverdata
-            this.serverdata = {
-                //以下为数据格式
-                //数据库中该表共有数据条数
-                datalength: 12,
-                //100条初始数据
-                data: [
-                    {
-                        number: 7,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 8,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 9,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 0,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 1,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 2,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 3,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 4,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 5,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    },
-                    {
-                        number: 6,
-                        wechat: '18',
-                        alipay: 'New York No. 1 Lake Park',
-                    }
-
-                ]
-            };
-            this.table_total = this.serverdata.datalength;
-            this.changepage(1);
+            this.init();
         }
     };
 </script>
