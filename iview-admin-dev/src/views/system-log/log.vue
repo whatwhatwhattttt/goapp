@@ -7,7 +7,8 @@
             <Col span="21">
             <card>
                 <Row>
-                    <Col span="8">
+                    <Col span="8" style="overflow:hidden;
+  text-overflow:clip;">
                     <!--todo 每月自动清理功能留待后期完善-->
                     <p class="log-title-color">系统管理日志（每月初将自动清理两月前的日志）</p>
                     </Col>
