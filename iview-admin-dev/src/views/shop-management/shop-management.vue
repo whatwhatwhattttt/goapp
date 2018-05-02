@@ -11,8 +11,12 @@
                     <p class="shop-title-color">商铺管理</p>
                     </Col>
 
-                    <Col span="10" offset="5">
-                    <zxksearch :searchlist="searchlist" :loading="loading" @zxksearch_f="search"></zxksearch>
+                    <Col span="20">
+                    <zxksearch :searchlist="searchlist"
+                               :loading="loading"
+                               @zxksearch_f="search"
+                               @zxksearch_s="zxksort">
+                    </zxksearch>
                     </Col>
                 </Row>
             </card>
@@ -28,10 +32,13 @@
                     <Page
                             size="small"
                             :total=table_total
-                            :current=1
+                            :current=current_page
+                            :page_size=page_size
                             showTotal
+                            showSizer
                             show-elevator
-                            @on-change="changepage">
+                            @on-change="changepage"
+                            @on-page-size-change="changepage_size">
                     </Page>
                 </div>
                 </Col>
@@ -45,7 +52,8 @@
             return {
                 table_total: null,
                 current_page: 1,
-                older_page: 1,
+                page_size: 10,
+                sort: 0,
                 place: null,
                 searchlist: [
                     ['wechat', '店铺名'],
@@ -230,17 +238,24 @@
                 this.changepage(1);
                 this.dataload();
             },
-            //  todo 搜索
-            search  (index) {
+            //todo 搜索
+            search(index){
                 this.loading = true;
+                alert(index[0]);
                 setTimeout(() => {
                     if (index[0]) {
                         // todo 向api发送字符串并返回匹配数据
-                        //  this.serverdata=
+                        //this.serverdata=
                         this.init();
                     }
                     this.loading = false;
                 }, 500);
+            },
+            //排序
+            zxksort(){
+                this.serverdata.data.reverse();
+                console.log(this.serverdata.data);
+                this.changepage(1);
             },
             // todo 分页操作
             // index为页数
@@ -248,14 +263,18 @@
                 this.loading = true;
                 this.current_page = index;
                 this.data = [];
-                let fstart = (this.current_page - 1) * 10;
-                let fend = this.current_page * 10 < this.table_total ? this.current_page * 10 : this.table_total;
+                let fstart = (this.current_page - 1) * this.page_size;
+                let fend = this.current_page * this.page_size < this.table_total ? this.current_page * this.page_size : this.table_total;
                 setTimeout(() => {
                     for (let i = fstart; i < fend; i++) {
                         this.data.push(this.serverdata.data[i]);
                     }
                     this.loading = false;
                 }, 500);
+            },
+            changepage_size(index){
+                this.page_size = index;
+                this.changepage(this.current_page);
             },
             //数据拉取
             dataload(){

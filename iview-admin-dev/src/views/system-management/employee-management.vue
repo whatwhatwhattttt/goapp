@@ -12,7 +12,11 @@
                     </Col>
 
                     <Col span="20">
-                    <zxksearch :searchlist="searchlist" :loading="loading" @zxksearch_f="search"></zxksearch>
+                    <zxksearch :searchlist="searchlist"
+                               :loading="loading"
+                               @zxksearch_f="search"
+                               @zxksearch_s="zxksort">
+                    </zxksearch>
                     </Col>
                 </Row>
             </card>
@@ -144,8 +148,8 @@
                 loading: false,
                 table_total: null,
                 current_page: 1,
-                older_page: 1,
                 page_size: 10,
+                sort: 0,
                 place: null,
                 //搜索可选
                 searchlist: [
@@ -406,7 +410,7 @@
             //todo 搜索
             search(index){
                 this.loading = true;
-                alert(index[3]);
+                alert(index[0]);
                 setTimeout(() => {
                     if (index[0]) {
                         // todo 向api发送字符串并返回匹配数据
@@ -415,6 +419,12 @@
                     }
                     this.loading = false;
                 }, 500);
+            },
+            //排序
+            zxksort(){
+                this.serverdata.data.reverse();
+                console.log(this.serverdata.data);
+                this.changepage(1);
             },
             // todo 分页操作
             // index为页数
