@@ -129,14 +129,13 @@
                     this.$emit('zxksearch_f', [this.judge, this.search_v, this.search_t]);
                 }
                 else {
-                    this.$Message.error('输入要搜索的内容');
-                    this.search_t = '';
+                    this.$emit('zxksearch_f', [this.judge]);
                 }
             }
         },
         watch: {
             sort: function () {
-                this.$emit('zxk_sort', this.sort);
+                    this.$emit('zxksearch_s');
             }
         }
     }
