@@ -163,7 +163,6 @@
             //todo 搜索
             search(index){
                 this.loading = true;
-                alert(index[0]);
                 setTimeout(() => {
                     if (index[0]) {
                         // todo 向api发送字符串并返回匹配数据
