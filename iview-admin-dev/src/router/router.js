@@ -16,7 +16,7 @@ export const testRouter = {
     meta: {
         title: 'test'
     },
-    component: () => import('@/views/my-components/zxksearch/zxksearch.vue')
+    component: () => import('@/test.vue')
 }
 
 export const page404 = {

@@ -5,7 +5,7 @@
             <Card>
                 <Row>
                     <Col span="10" offset="7">
-                    <zxksearch :selectlist="selectlist" :loading="loading" @zxksearch_f="search"></zxksearch>
+                    <Button @click="gettimearray">天数显示</Button>
                     </Col>
                 </Row>
             </Card>
@@ -13,36 +13,21 @@
         </Row>
     </div>
 </template>
-
-
 <script>
     export default{
         data () {
             return {
-                loading: false,
-                selectlist: [
-                    ['wechat', '微信账号'],
-                    ['wechat_balance', '微信账号内资金'],
-                    ['alipay', '支付宝账号'],
-                    ['alipay_balance', '支付宝账号内资金']
-                ]
+                timearray: []
             };
         },
         methods: {
-            search (index) {
-                this.loading = true;
-                setTimeout(() => {
-                    if (this.search_t && this.search_t.trim() != '') {
-                        // todo 向api发送字符串并返回匹配数据
-                        //  this.serverdata=
-                        this.init();
-                    }
-                    else {
-                        this.$Message.error('输入要搜索的内容');
-                        this.search_t = null;
-                    }
-                    this.loading = false;
-                }, 500);
+            gettimearray () {
+                let curDate = new Date();
+                curDate.setDate(0);
+                let curday = curDate.getDate();
+                for (let i = 1; i <= curday; i++) {
+                    this.timearray.push(i.toString());
+                }
             }
         }
     };
