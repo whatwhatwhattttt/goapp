@@ -38,6 +38,7 @@
                             :page_size=page_size
                             showTotal
                             showSizer
+                            placement="top"
                             show-elevator
                             @on-change="changepage"
                             @on-page-size-change="changepage_size">
