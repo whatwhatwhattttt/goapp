@@ -2,7 +2,19 @@ import {otherRouter, appRouter} from '@/router/router';
 import Util from '@/libs/util';
 import Cookies from 'js-cookie';
 import Vue from 'vue';
+import store from './../index';
+import jwtToken from './../../libs/helpers/jwt';
+import axios from 'axios'
 
+axios.interceptors.request.use(function (config) {
+    if(jwtToken.getToken()){
+        config.headers['Authorization']='Bearer'+jwtToken.getToken();
+    }
+    return config;
+},function (error) {
+        return Promise.reject(error);
+    }
+);
 const app = {
     state: {
         cachePage: [],
@@ -193,5 +205,10 @@ const app = {
         }
     }
 };
+new Vue({
+    el:'#app',
+    otherRouter,
+    store
+});
 
 export default app;
