@@ -9,8 +9,8 @@
             <span class="expand-value">{{ row.realname }}</span>
             </Col>
             <Col span="8">
-            <span class="expand-key">邮箱: </span>
-            <span class="expand-value">{{ row.mail }}</span>
+            <span class="expand-key">手机: </span>
+            <span class="expand-value">{{ row.mobile_phone }}</span>
             </Col>
             <Col span="8">
             <span class="expand-key">qq: </span>
