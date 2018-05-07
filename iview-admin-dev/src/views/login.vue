@@ -40,6 +40,7 @@
 <script>
     import Cookies from 'js-cookie';
     export default {
+
         data () {
             return {
                 form: {
@@ -58,8 +59,25 @@
                 }
             };
         },
+        watch:{
+            "$route" : 'checkLogin'
+        },
+        created() {
+            this.checkLogin();
+        },
         methods: {
-            handleSubmit () {
+            checkLogin(){
+                //检查是否存在session
+                //cookie操作方法在源码里有或者参考网上的即可
+                if (!this.getCookie('session')) {
+                    //如果没有登录状态则跳转到登录页
+                    this.$router.push('/login');
+                } else {
+                    //否则跳转到登录后的页面
+                    this.$router.push('/user_info');
+                }
+            },
+            handleSubmit (){
                 this.$refs.loginForm.validate((valid) => {
                     if (valid) {
                         Cookies.set('user', this.form.admin_id);
@@ -81,5 +99,5 @@
 </script>
 
 <style>
-
+    
 </style>

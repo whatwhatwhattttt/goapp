@@ -1,5 +1,6 @@
 import Main from '@/views/Main.vue'
-
+//import Store from './../store/index'
+// import jwtToken from './../libs/helpers/jwt'
 // 不作为Main组件的子页面展示的页面单独写，如下
 export const loginRouter = {
     path: '/login',
@@ -63,13 +64,15 @@ export const otherRouter = {
             path: 'home',
             title: '首页',
             name: 'home_index',
-            component: () => import('@/views/home/home.vue')
+            component: () => import('@/views/home/home.vue'),
+            meta:{requireAuth:true}
         },
         {
             path: 'ownspace',
             title: '个人中心',
             name: 'ownspace_index',
-            component: () => import('@/views/ownspace/ownspace.vue')
+            component: () => import('@/views/ownspace/ownspace.vue'),
+            meta:{requireAuth:true}
         },
         {
             path: 'message',
@@ -297,4 +300,14 @@ export const routers = [
     page500,
     page403,
     page404
-]
+];
+// otherRouter.beforeEach((to,from,next) =>{
+//     if(to.meta.requireAuth){
+//         if(Store.state.authenticated ||jwtToken.getToken()){
+//             return next()
+//         }else {
+//             return next({'name':'login'})
+//         }
+//     }
+//
+// });
