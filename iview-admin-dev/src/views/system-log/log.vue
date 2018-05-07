@@ -197,7 +197,7 @@
                             role: '1,2',
                             description: ['1', '2'],
                             time: '123123'
-                        },
+                        }
                     ]
                 };
                 this.table_total = this.serverdata.datalength;

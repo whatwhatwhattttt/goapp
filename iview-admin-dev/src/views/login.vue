@@ -30,7 +30,6 @@
                             <Button @click="handleSubmit" type="primary" long>登录</Button>
                         </FormItem>
                     </Form>
-                    <p class="login-tip">输入任意用户名和密码即可</p>
                 </div>
             </Card>
         </div>
@@ -78,15 +77,21 @@
                 }
             },
             handleSubmit (){
+
                 this.$refs.loginForm.validate((valid) => {
                     if (valid) {
+                        this.axios.get('http://goapp.com/api/login')
+                            .then((response) => {
+
+                            });
                         Cookies.set('user', this.form.admin_id);
                         Cookies.set('password', this.form.password);
                         this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
                         if (this.form.admin_id === 'iview_admin') {
                             Cookies.set('access', 1);
-                        } else {
-                            Cookies.set('access', 0);
+                        }
+                        else {
+                            this.$Message
                         }
                         this.$router.push({
                             name: 'home_index'

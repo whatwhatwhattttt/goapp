@@ -148,7 +148,7 @@
                     },
                     {
                         title: '昵称',
-                        key: 'nicknickname'
+                        key: 'nickname'
                     },
                     {
                         title: '性别',
@@ -201,6 +201,7 @@
                         }
                     }
                 ],
+                serverdata: [],
                 data: [],
                 searchlist: [
                     ['mail', '账号（邮箱）'],
@@ -216,111 +217,118 @@
             //初始化方法
             init(){
                 // todo 向api请求100条初始数据并放入serverdata
-                this.serverdata = {
-                    //以下为数据格式
-                    //数据库中该表共有数据条数
-                    datalength: 8,
-                    //100条初始数据
-                    data: [
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        },
-
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        },
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        },
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        },
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        },
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        },
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        },
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        }
-                    ]
-                };
+                this.axios.get('http://goapp.com/api/users')
+                    .then((response) => {
+                        console.log(response.data);
+                        this.serverdata.data = [];
+                        this.serverdata.data = response.data.data;
+                    });
+//                this.serverdata = {
+//                    //以下为数据格式
+//                    //数据库中该表共有数据条数
+//                    datalength: 8,
+//                    //100条初始数据
+//                    data: [
+//                        {
+//                            mobile_phone: '18072078275',
+//                            nicknickname: '哎呦我去',
+//                            gander: 'man',
+//                            age: '18',
+//                            realname: 'zxk',
+//                            mail: '475811666@qq.com',
+//                            qq: '475811666',
+//                            password: '123234123',
+//                            id_card: '33333333333333333333',
+//                            create_time: '2018-asd-22'
+//                        },
+//                        {
+//                            mobile_phone: '18072078275',
+//                            nicknickname: '哎呦我去',
+//                            gander: 'man',
+//                            age: '18',
+//                            realname: 'zxk',
+//                            mail: '475811666@qq.com',
+//                            qq: '475811666',
+//                            password: '123234123',
+//                            id_card: '33333333333333333333',
+//                            create_time: '2018-asd-22'
+//                        },
+//                        {
+//                            mobile_phone: '18072078275',
+//                            nicknickname: '哎呦我去',
+//                            gander: 'man',
+//                            age: '18',
+//                            realname: 'zxk',
+//                            mail: '475811666@qq.com',
+//                            qq: '475811666',
+//                            password: '123234123',
+//                            id_card: '33333333333333333333',
+//                            create_time: '2018-asd-22'
+//                        },
+//                        {
+//                            mobile_phone: '18072078275',
+//                            nicknickname: '哎呦我去',
+//                            gander: 'man',
+//                            age: '18',
+//                            realname: 'zxk',
+//                            mail: '475811666@qq.com',
+//                            qq: '475811666',
+//                            password: '123234123',
+//                            id_card: '33333333333333333333',
+//                            create_time: '2018-asd-22'
+//                        },
+//                        {
+//                            mobile_phone: '18072078275',
+//                            nicknickname: '哎呦我去',
+//                            gander: 'man',
+//                            age: '18',
+//                            realname: 'zxk',
+//                            mail: '475811666@qq.com',
+//                            qq: '475811666',
+//                            password: '123234123',
+//                            id_card: '33333333333333333333',
+//                            create_time: '2018-asd-22'
+//                        },
+//                        {
+//                            mobile_phone: '18072078275',
+//                            nicknickname: '哎呦我去',
+//                            gander: 'man',
+//                            age: '18',
+//                            realname: 'zxk',
+//                            mail: '475811666@qq.com',
+//                            qq: '475811666',
+//                            password: '123234123',
+//                            id_card: '33333333333333333333',
+//                            create_time: '2018-asd-22'
+//                        },
+//                        {
+//                            mobile_phone: '18072078275',
+//                            nicknickname: '哎呦我去',
+//                            gander: 'man',
+//                            age: '18',
+//                            realname: 'zxk',
+//                            mail: '475811666@qq.com',
+//                            qq: '475811666',
+//                            password: '123234123',
+//                            id_card: '33333333333333333333',
+//                            create_time: '2018-asd-22'
+//                        },
+//                        {
+//                            mobile_phone: '18072078275',
+//                            nicknickname: '哎呦我去',
+//                            gander: 'man',
+//                            age: '18',
+//                            realname: 'zxk',
+//                            mail: '475811666@qq.com',
+//                            qq: '475811666',
+//                            password: '123234123',
+//                            id_card: '33333333333333333333',
+//                            create_time: '2018-asd-22'
+//                        }
+//                    ]
+//                };
+                this.serverdata.datalength = 10;
+                console.log(this.serverdata);
                 this.table_total = this.serverdata.datalength;
                 this.changepage(1);
                 this.dataload();
@@ -374,7 +382,6 @@
                             this.loading = false;
                             this.edit_modal = false;
                             //todo 修改api用户数据
-
                             if (1)//判断api返回值
                             {
                                 this.$Message.success('修改成功');
@@ -405,7 +412,6 @@
                         this.$Message.error('修改失败');
                     }
                 }, 500);
-
             }
         },
         mounted () {
