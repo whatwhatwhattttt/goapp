@@ -20,14 +20,16 @@ const store = new Vuex.Store({
     modules: {
         app,
         user,
-        AuthUser
-    }
-});
-
-export default new Vuex.Store({
-    modules:{
         AuthUser,
         Login
-    },
-    strict:true
-});
+    }
+ });
+//
+// export default new Vuex.Store({
+//     modules:{
+//         AuthUser,
+//         Login
+//     },
+//     strict:true
+// });
+export  default  store;

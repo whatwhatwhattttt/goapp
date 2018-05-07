@@ -3,7 +3,7 @@
 </style>
 
 <template>
-    <div class="login" @keydown.enter="login">
+    <div class="login" @keydown.enter="handleSubmit">
         <div class="login-con">
             <Card :bordered="false">
                 <p slot="title">
@@ -27,10 +27,10 @@
                             </Input>
                         </FormItem>
                         <FormItem>
-                            <Button @click="login" type="primary" long>登录</Button>
+                            <Button @click="handleSubmit" type="primary" long>登录</Button>
                         </FormItem>
                     </Form>
-
+                    <p class="login-tip">输入任意用户名和密码即可</p>
                 </div>
             </Card>
         </div>
@@ -38,13 +38,13 @@
 </template>
 
 <script>
- //   import Cookies from 'js-cookie';
-    import jwtToken from './../libs/helpers/jwt'
+    import Cookies from 'js-cookie';
     export default {
+
         data () {
             return {
                 form: {
-                    admin_id: '',
+                    admin_id: 'iview_admin',
                     password: ''
                 },
                 rules: {
@@ -59,20 +59,45 @@
                 }
             };
         },
+        watch:{
+            "$route" : 'checkLogin'
+        },
+        created() {
+            this.checkLogin();
+        },
         methods: {
-            login(){
-                let formData={
-                    email:this.form.admin_id,
-                    password:this.form.password
-                };
-                this.$store.dispatch('loginRequest',formData).then(response=>{
-                    this.$route.push({name:'home_index'})
-                })
+            checkLogin(){
+                //检查是否存在session
+                //cookie操作方法在源码里有或者参考网上的即可
+                if (!this.getCookie('session')) {
+                    //如果没有登录状态则跳转到登录页
+                    this.$router.push('/login');
+                } else {
+                    //否则跳转到登录后的页面
+                    this.$router.push('/user_info');
+                }
+            },
+            handleSubmit (){
+                this.$refs.loginForm.validate((valid) => {
+                    if (valid) {
+                        Cookies.set('user', this.form.admin_id);
+                        Cookies.set('password', this.form.password);
+                        this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
+                        if (this.form.admin_id === 'iview_admin') {
+                            Cookies.set('access', 1);
+                        } else {
+                            Cookies.set('access', 0);
+                        }
+                        this.$router.push({
+                            name: 'home_index'
+                        });
+                    }
+                });
             }
         }
     };
 </script>
 
 <style>
-
+    
 </style>
