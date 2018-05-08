@@ -1,4 +1,5 @@
 import Main from '@/views/Main.vue';
+import Cookies from 'js-cookie';
 //import Store from './../store/index'
 // import jwtToken from './../libs/helpers/jwt'
 // 不作为Main组件的子页面展示的页面单独写，如下

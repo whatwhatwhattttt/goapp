@@ -39,11 +39,10 @@
 <script>
     import Cookies from 'js-cookie';
     export default {
-
         data () {
             return {
                 form: {
-                    admin_id: 'iview_admin',
+                    admin_id: '',
                     password: ''
                 },
                 rules: {
@@ -58,8 +57,8 @@
                 }
             };
         },
-        watch:{
-            "$route" : 'checkLogin'
+        watch: {
+            "$route": 'checkLogin'
         },
         created() {
             this.checkLogin();
@@ -77,25 +76,29 @@
                 }
             },
             handleSubmit (){
-
                 this.$refs.loginForm.validate((valid) => {
                     if (valid) {
-                        this.axios.get('http://goapp.com/api/login')
-                            .then((response) => {
-
-                            });
+                        this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
+                        //这几条是测试 完成正式代码后注释
                         Cookies.set('user', this.form.admin_id);
                         Cookies.set('password', this.form.password);
-                        this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
-                        if (this.form.admin_id === 'iview_admin') {
-                            Cookies.set('access', 1);
-                        }
-                        else {
-                            this.$Message
-                        }
-                        this.$router.push({
-                            name: 'home_index'
-                        });
+                        Cookies.set('access',1);
+                        //todo 正式代码
+//                        this.axios.post('http://goapp.com/api/login', {
+//                            //todo 这是传给后台的值
+//                            admin_id: this.form.admin_id,
+//                            password: this.form.password
+//                        })
+//                            .then((response) => {
+//                                Cookies.set('user', this.form.admin_id);
+//                                Cookies.set('password', this.form.password);
+//                                Cookies.set('access', 1);
+//                                this.$router.push({
+//                                    name: 'home_index'
+//                                });
+//                            }).catch((error)=>{
+//                            this.$Message.success('账号或密码错误');
+//                        });
                     }
                 });
             }
@@ -104,5 +107,5 @@
 </script>
 
 <style>
-    
+
 </style>

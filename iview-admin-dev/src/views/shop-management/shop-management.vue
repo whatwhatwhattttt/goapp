@@ -14,6 +14,7 @@
                     <Col span="20">
                     <zxksearch :searchlist="searchlist"
                                :loading="loading"
+                               @zxk_init="init"
                                @zxksearch_f="search"
                                @zxksearch_s="zxksort">
                     </zxksearch>
@@ -54,11 +55,14 @@
                 table_total: null,
                 current_page: 1,
                 page_size: 10,
-                sort: 0,
+                loading: false,
                 place: null,
                 searchlist: [
                     ['wechat', '店铺名'],
-                    ['wechat_balance', '店主']
+                    ['wechat_balance', '店主'],
+                    ['id', '店铺编号'],
+                    ['auditor', '审核人员'],
+                    ['level', '店铺星级']
                 ],
                 columns: [
                     {
@@ -111,142 +115,149 @@
         methods: {
             //  初始化方法
             init () {
-                // todo 向api请求100条初始数据并放入serverdata
-                this.serverdata = {
-                    //  以下为数据格式
-                    //  数据库中该表共有数据条数
-                    datalength: 8,
-                    //  100条初始数据
-                    data: [
-                        {
-                            // 店铺名
-                            name: 'John Brown shop123',
-                            // 店主名称
-                            user_name: 'sdfgdfbd',
-                            // 店铺编号
-                            id: '000000001',
-                            // 店铺介绍
-                            description: '这是一家专卖速度符卡都很方便卡迪夫可视对讲防守打法的店',
-                            // 店内产品
-                            products: '土豆，西红柿，腊肉',
-                            // 总星数
-                            star: 99,
-                            // 评价人数
-                            evaluation_number: 33,
-                            // 店铺星级
-                            level: 3,
-                            // 营业额
-                            turnover: 1616551,
-                            // 审核人员
-                            auditor: 'yourself',
-                            // 审核时间
-                            approval_time: '2017-8-7',
-                            // 开业时间
-                            opening_time: '2017-8-9',
-                            // 运营状态
-                            run: 1
-                        },
-                        {
-                            name: 'John Brown shop2222',
-                            user_name: 'sdfgdf撒东西吃vbd',
-                            id: '000000002',
-                            description: '这是一家专卖速度符卡都很方便卡迪夫可视对讲防守打法的店',
-                            products: '土豆，西红柿，腊肉',
-                            star: 99,
-                            turnover: 1616551,
-                            evaluation_number: 33,
-                            level: 3,
-                            auditor: 'yourself',
-                            approval_time: '2017-8-7',
-                            opening_time: '2017-8-9',
-                            run: 0
-                        },
-                        {
-                            name: 'John Brown',
-                            age: 18,
-                            job_number: 'New York No. 1 Lake Park',
-                            position: '仓库管理',
-                            role: '仓库管理',
-                            admin_id: '123123',
-                            password: '123234123'
-                        },
-                        {
-                            name: 'John Brown',
-                            age: 18,
-                            job_number: 'New York No. 1 Lake Park',
-                            position: '仓库管理',
-                            role: '仓库管理',
-                            admin_id: '123123',
-                            password: '123234123'
-                        },
-                        {
-                            name: 'John Brown',
-                            age: 18,
-                            job_number: 'New York No. 1 Lake Park',
-                            position: '仓库管理',
-                            role: '仓库管理',
-                            admin_id: '123123',
-                            password: '123234123'
-                        },
-                        {
-                            name: 'John Brown',
-                            age: 18,
-                            job_number: 'New York No. 1 Lake Park',
-                            position: '仓库管理',
-                            role: '仓库管理',
-                            admin_id: '123123',
-                            password: '123234123'
-                        },
-                        {
-                            name: 'John Brown',
-                            age: 18,
-                            job_number: 'New York No. 1 Lake Park',
-                            position: '仓库管理',
-                            role: '仓库管理',
-                            admin_id: '123123',
-                            password: '123234123'
-                        },
-                        {
-                            name: 'John Brown',
-                            age: 18,
-                            job_number: 'New York No. 1 Lake Park',
-                            position: '仓库管理',
-                            role: '仓库管理',
-                            admin_id: '123123',
-                            password: '123234123'
-                        },
-                        {
-                            name: 'John Brown',
-                            age: 18,
-                            job_number: 'New York No. 1 Lake Park',
-                            position: '仓库管理',
-                            role: '仓库管理',
-                            admin_id: '123123',
-                            password: '123234123'
-                        },
-                        {
-                            name: 'John Brown',
-                            age: 18,
-                            job_number: 'New York No. 1 Lake Park',
-                            position: '仓库管理',
-                            role: '仓库管理',
-                            admin_id: '123123',
-                            password: '123234123'
-                        }
-                    ]
-                };
-                this.table_total = this.serverdata.datalength;
-                this.changepage(1);
-                this.dataload();
+                // todo 向api请求数据并放入serverdata
+                this.axios.get('http://goapp.com/api/users')
+                    .then((response) => {
+                        this.serverdata.data = response.data.data;
+                        this.table_total = response.data.data.length;
+                        this.changepage(1);
+                    });
+//                this.serverdata = {
+//                    //  以下为数据格式
+//                    //  数据库中该表共有数据条数
+//                    datalength: 8,
+//                    //  100条初始数据
+//                    data: [
+//                        {
+//                            // 店铺名
+//                            name: 'John Brown shop123',
+//                            // 店主名称
+//                            user_name: 'sdfgdfbd',
+//                            // 店铺编号
+//                            id: '000000001',
+//                            // 店铺介绍
+//                            description: '这是一家专卖速度符卡都很方便卡迪夫可视对讲防守打法的店',
+//                            // 店内产品
+//                            products: '土豆，西红柿，腊肉',
+//                            // 总星数
+//                            star: 99,
+//                            // 评价人数
+//                            evaluation_number: 33,
+//                            // 店铺星级
+//                            level: 3,
+//                            // 营业额
+//                            turnover: 1616551,
+//                            // 审核人员
+//                            auditor: 'yourself',
+//                            // 审核时间
+//                            approval_time: '2017-8-7',
+//                            // 开业时间
+//                            opening_time: '2017-8-9',
+//                            // 运营状态
+//                            run: 1
+//                        },
+//                        {
+//                            name: 'John Brown shop2222',
+//                            user_name: 'sdfgdf撒东西吃vbd',
+//                            id: '000000002',
+//                            description: '这是一家专卖速度符卡都很方便卡迪夫可视对讲防守打法的店',
+//                            products: '土豆，西红柿，腊肉',
+//                            star: 99,
+//                            turnover: 1616551,
+//                            evaluation_number: 33,
+//                            level: 3,
+//                            auditor: 'yourself',
+//                            approval_time: '2017-8-7',
+//                            opening_time: '2017-8-9',
+//                            run: 0
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            age: 18,
+//                            job_number: 'New York No. 1 Lake Park',
+//                            position: '仓库管理',
+//                            role: '仓库管理',
+//                            admin_id: '123123',
+//                            password: '123234123'
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            age: 18,
+//                            job_number: 'New York No. 1 Lake Park',
+//                            position: '仓库管理',
+//                            role: '仓库管理',
+//                            admin_id: '123123',
+//                            password: '123234123'
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            age: 18,
+//                            job_number: 'New York No. 1 Lake Park',
+//                            position: '仓库管理',
+//                            role: '仓库管理',
+//                            admin_id: '123123',
+//                            password: '123234123'
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            age: 18,
+//                            job_number: 'New York No. 1 Lake Park',
+//                            position: '仓库管理',
+//                            role: '仓库管理',
+//                            admin_id: '123123',
+//                            password: '123234123'
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            age: 18,
+//                            job_number: 'New York No. 1 Lake Park',
+//                            position: '仓库管理',
+//                            role: '仓库管理',
+//                            admin_id: '123123',
+//                            password: '123234123'
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            age: 18,
+//                            job_number: 'New York No. 1 Lake Park',
+//                            position: '仓库管理',
+//                            role: '仓库管理',
+//                            admin_id: '123123',
+//                            password: '123234123'
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            age: 18,
+//                            job_number: 'New York No. 1 Lake Park',
+//                            position: '仓库管理',
+//                            role: '仓库管理',
+//                            admin_id: '123123',
+//                            password: '123234123'
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            age: 18,
+//                            job_number: 'New York No. 1 Lake Park',
+//                            position: '仓库管理',
+//                            role: '仓库管理',
+//                            admin_id: '123123',
+//                            password: '123234123'
+//                        }
+//                    ]
+//                };
             },
-            //todo 搜索
+            //搜索
             search(index){
                 this.loading = true;
                 setTimeout(() => {
                     if (index[0]) {
                         // todo 向api发送字符串并返回匹配数据
-                        //this.serverdata=
-                        this.init();
+                        this.axios.post('http://goapp.com/api/users', index)
+                            .then((response) => {
+                                this.serverdata.data = response.data.data;
+                                this.table_total = response.data.data.length;
+                                this.changepage(1);
+                            });
                     }
                     this.loading = false;
                 }, 500);
@@ -275,10 +286,6 @@
             changepage_size(index){
                 this.page_size = index;
                 this.changepage(this.current_page);
-            },
-            //数据拉取
-            dataload(){
-                //todo 拉取所有数据
             },
             showinfo () {
                 let query = this.data[this.place];

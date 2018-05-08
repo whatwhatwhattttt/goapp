@@ -2,7 +2,7 @@
     <div>
         <Col span="24">
         <Row>
-            <Col span="6">
+            <Col span="5">
             <DatePicker
                     :disabled="loading"
                     type="daterange"
@@ -11,8 +11,7 @@
                     :options="options"
                     placement="bottom-end"
                     placeholder="可选择日期"
-                    style="width: 200px"
-                    @on-ok="datachange">
+                    style="width: 200px">
             </DatePicker>
             </Col>
             <Col span="3">
@@ -27,7 +26,7 @@
                 </Radio>
             </RadioGroup>
             </Col>
-            <Col span="15">
+            <Col span="13">
             <Input
                     type="text"
                     :style="{width: textwidth+'px'}"
@@ -38,6 +37,9 @@
             </i-select>
             <Button type="primary" :loading="loading" slot="append" icon="ios-search" @click="search_f"></Button>
             </Input>
+            </Col>
+            <Col span="3">
+            <Button type="primary" @click="init" long>初始化</Button>
             </Col>
         </Row>
         </Col>
@@ -119,23 +121,23 @@
             }
         },
         methods: {
-            datachange (){
-                this.$emit('zxk_datachange', this.time);
-            },
             search_f () {
                 this.search_t = this.search_t.trim();
-                if (this.search_t) {
+                if (this.search_t || this.time) {
                     this.judge = true;
-                    this.$emit('zxksearch_f', [this.judge, this.search_v, this.search_t]);
+                    this.$emit('zxksearch_f', [this.judge, this.search_v, this.search_t, this.time]);
                 }
                 else {
                     this.$emit('zxksearch_f', [this.judge]);
                 }
+            },
+            init(){
+                this.$emit('zxk_init');
             }
         },
         watch: {
             sort: function () {
-                    this.$emit('zxksearch_s');
+                this.$emit('zxksearch_s');
             }
         }
     }

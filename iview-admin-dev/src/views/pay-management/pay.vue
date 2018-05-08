@@ -4,26 +4,6 @@
 </style>
 <template>
     <div>
-        <Row style="position:fixed;top:100px;z-index: 999;width:100%">
-            <Col span="21">
-            <card>
-                <Row>
-                    <Col span="3">
-                    <p class="pay-title-color">支付管理</p>
-                    </Col>
-
-
-                    <Col span="20">
-                    <zxksearch :searchlist="searchlist"
-                               :loading="loading"
-                               @zxksearch_f="search"
-                               @zxksearch_s="zxksort">
-                    </zxksearch>
-                    </Col>
-                </Row>
-            </card>
-            </Col>
-        </Row>
         <Row style="position:fixed;top:167px;z-index: 999;width:100%">
             <card class="pay-tip">
                 <Col span="18">
@@ -47,8 +27,28 @@
                 </Col>
             </card>
         </Row>
+        <Row style="position:fixed;top:100px;z-index: 999;width:100%">
+            <Col span="21">
+            <card>
+                <Row>
+                    <Col span="3">
+                    <p class="pay-title-color">支付管理</p>
+                    </Col>
+
+                    <Col span="20">
+                    <zxksearch :searchlist="searchlist"
+                               :loading="loading"
+                               @zxk_init="init"
+                               @zxksearch_f="search"
+                               @zxksearch_s="zxksort">
+                    </zxksearch>
+                    </Col>
+                </Row>
+            </card>
+            </Col>
+        </Row>
         <Row style="margin-top: 128px;margin-bottom: 50px;">
-        <Table border :loading="loading" :columns="columns" :data="data"></Table>
+            <Table border :loading="loading" :columns="columns" :data="data"></Table>
         </Row>
         <Row>
             <Card style="position:fixed;bottom:0px;z-index: 999;width:100%;height: 60px;">
@@ -69,7 +69,7 @@
                 </div>
                 </Col>
                 <Col span="3" offset="2">
-                <Button @click="add_modal=true" long>添加方案</Button>
+                <Button type="primary" @click="add_modal=true" long>添加方案</Button>
                 </Col>
             </Card>
         </Row>
@@ -159,7 +159,6 @@
                 //跳转页码
                 current_page: 1,
                 page_size: 10,
-                sort: 0,
                 //表格数据位置
                 place: null,
                 //搜索可选
@@ -270,79 +269,85 @@
         methods: {
             //初始化方法
             init(){
+                // todo 向api请求数据并放入serverdata
+                this.axios.get('http://goapp.com/api/users')
+                    .then((response) => {
+                        this.serverdata.data = response.data.data;
+                        // todo 此处特别说明tip内有wechat: '111', alipay: '222'两个值为正在使用的微信与支付宝账号
+                        this.tip = response.data.tip;
+                        this.table_total = response.data.data.length;
+                        this.changepage(1);
+                    });
                 // todo 向api请求100条初始数据并放入serverdata
-                this.serverdata = {
-                    //以下为数据格式
-                    //数据库中该表共有数据条数
-                    datalength: 12,
-                    //100条初始数据
-                    data: [
-                        {
-                            number: 7,
-                            wechat: '183424242423253345',
-                            alipay: '32524534345453434553',
-                        },
-                        {
-                            number: 8,
-                            wechat: '18',
-                            alipay: 'New York No. 1 Lake Park',
-                        },
-                        {
-                            number: 9,
-                            wechat: '18',
-                            alipay: 'New York No. 1 Lake Park',
-                        },
-                        {
-                            number: 0,
-                            wechat: '18',
-                            alipay: 'New York No. 1 Lake Park',
-                        },
-                        {
-                            number: 1,
-                            wechat: '18',
-                            alipay: 'New York No. 1 Lake Park',
-                        },
-                        {
-                            number: 2,
-                            wechat: '18',
-                            alipay: 'New York No. 1 Lake Park',
-                        },
-                        {
-                            number: 3,
-                            wechat: '18',
-                            alipay: 'New York No. 1 Lake Park',
-                        },
-                        {
-                            number: 4,
-                            wechat: '18',
-                            alipay: 'New York No. 1 Lake Park',
-                        },
-                        {
-                            number: 5,
-                            wechat: '18',
-                            alipay: 'New York No. 1 Lake Park',
-                        },
-                        {
-                            number: 6,
-                            wechat: '18',
-                            alipay: 'New York No. 1 Lake Park',
-                        },
-                        {
-                            number: 6,
-                            wechat: '18',
-                            alipay: 'New York No. 1 Lake Park',
-                        },
-                        {
-                            number: 6,
-                            wechat: '18',
-                            alipay: 'New York No. 1 Lake Park',
-                        }
-
-                    ]
-                };
-                this.table_total = this.serverdata.datalength;
-                this.changepage(1);
-                this.dataload();
+//                this.serverdata = {
+//                    //以下为数据格式
+//                    //数据库中该表共有数据条数
+//                    datalength: 12,
+//                    //100条初始数据
+//                    data: [
+//                        {
+//                            number: 7,
+//                            wechat: '183424242423253345',
+//                            alipay: '32524534345453434553',
+//                        },
+//                        {
+//                            number: 8,
+//                            wechat: '18',
+//                            alipay: 'New York No. 1 Lake Park',
+//                        },
+//                        {
+//                            number: 9,
+//                            wechat: '18',
+//                            alipay: 'New York No. 1 Lake Park',
+//                        },
+//                        {
+//                            number: 0,
+//                            wechat: '18',
+//                            alipay: 'New York No. 1 Lake Park',
+//                        },
+//                        {
+//                            number: 1,
+//                            wechat: '18',
+//                            alipay: 'New York No. 1 Lake Park',
+//                        },
+//                        {
+//                            number: 2,
+//                            wechat: '18',
+//                            alipay: 'New York No. 1 Lake Park',
+//                        },
+//                        {
+//                            number: 3,
+//                            wechat: '18',
+//                            alipay: 'New York No. 1 Lake Park',
+//                        },
+//                        {
+//                            number: 4,
+//                            wechat: '18',
+//                            alipay: 'New York No. 1 Lake Park',
+//                        },
+//                        {
+//                            number: 5,
+//                            wechat: '18',
+//                            alipay: 'New York No. 1 Lake Park',
+//                        },
+//                        {
+//                            number: 6,
+//                            wechat: '18',
+//                            alipay: 'New York No. 1 Lake Park',
+//                        },
+//                        {
+//                            number: 6,
+//                            wechat: '18',
+//                            alipay: 'New York No. 1 Lake Park',
+//                        },
+//                        {
+//                            number: 6,
+//                            wechat: '18',
+//                            alipay: 'New York No. 1 Lake Park',
+//                        }
+//
+//                    ]
+//                };
             },
             //todo 搜索
             search(index){
@@ -350,8 +355,12 @@
                 setTimeout(() => {
                     if (index[0]) {
                         // todo 向api发送字符串并返回匹配数据
-                        //this.serverdata=
-                        this.init();
+                        this.axios.post('http://goapp.com/api/users', index)
+                            .then((response) => {
+                                this.serverdata.data = response.data.data;
+                                this.table_total = response.data.data.length;
+                                this.changepage(1);
+                            });
                     }
                     this.loading = false;
                 }, 500);
@@ -381,32 +390,30 @@
                 this.page_size = index;
                 this.changepage(this.current_page);
             },
-            //数据拉取
-            dataload(){
-                //todo 拉取所有数据
-            },
-            add() {
+            add () {
                 this.loading = true;
-                this.$refs.pay_add_Form.validate((valid) => {
+                this.$refs.add_Form.validate((valid) => {
                     if (valid) {
                         setTimeout(() => {
                             this.loading = false;
                             this.add_modal = false;
-                            //todo 向api请求添加数据
-
-                            if (1) //api返回结果
-                            {
-                                this.form = [];
-                                this.$Message.success('添加成功');
-                            }
-                            else {
-                                this.$Message.error('添加失败');
-                            }
+                            //todo 向api请求插入数据 this.form.mail为该表单中mail值，以此为索引修改
+                            this.axios.post('http://goapp.com/api/users', this.form)
+                                .then((response) => {
+                                    if (response == 1)//返回值判断
+                                    {
+                                        this.form = [];
+                                        this.$Message.success('添加成功');
+                                    }
+                                    else {
+                                        this.$Message.error('添加失败');
+                                    }
+                                });
                         }, 500);
                     }
                     else {
                         this.loading = false;
-                        this.$Message.error('添加失败-请完善数据后重新提交');
+                        this.$Message.error('添加失败-请完善表单信息后重新提交');
                     }
                 });
             },
@@ -417,20 +424,22 @@
                         setTimeout(() => {
                             this.loading = false;
                             this.edit_modal = false;
-                            //todo 向api请求修改数据
-
-                            if (1) //api返回结果
-                            {
-                                this.$Message.success('修改成功');
-                            }
-                            else {
-                                this.$Message.error('修改失败');
-                            }
+                            //todo 修改api数据
+                            this.axios.post('http://goapp.com/api/users', this.form.admin_id)
+                                .then((response) => {
+                                    if (response == 1)//返回值判断
+                                    {
+                                        this.$Message.success('修改成功');
+                                    }
+                                    else {
+                                        this.$Message.error('修改失败');
+                                    }
+                                });
                         }, 500);
                     }
                     else {
                         this.loading = false;
-                        this.$Message.error('修改失败-请完善数据后重新提交');
+                        this.$Message.error('修改失败-请完善表单信息后重新提交');
                     }
                 });
             },
@@ -440,14 +449,17 @@
                     this.loading = false;
                     this.use_modal = false;
                     //todo 数据库修改正在使用的方案
-                    if (1) //api返回结果
-                    {
-                        this.tip = this.data[this.place];
-                        this.$Message.success('已启用');
-                    }
-                    else {
-                        this.$Message.error('启用失败');
-                    }
+                    this.axios.post('http://goapp.com/api/users', this.form.admin_id)
+                        .then((response) => {
+                            if (response == 1)//返回值判断
+                            {
+                                this.tip = this.data[this.place];
+                                this.$Message.success('已启用');
+                            }
+                            else {
+                                this.$Message.error('启用失败');
+                            }
+                        });
                 }, 500);
             },
             del () {
@@ -455,17 +467,18 @@
                 setTimeout(() => {
                     this.loading = false;
                     this.del_modal = false;
-                    //todo 数据库删除当前方案
-
-                    if (1) //api返回结果
-                    {
-                        this.data.splice(this.place, 1);
-                        this.table_total -= 1;
-                        this.$Message.success('删除成功');
-                    }
-                    else {
-                        this.$Message.error('删除失败');
-                    }
+                    //todo 从api删除
+                    this.axios.post('http://goapp.com/api/users', this.form.admin_id)
+                        .then((response) => {
+                            if (response == 1)//返回值判断
+                            {
+                                this.data.splice(this.place, 1);
+                                this.$Message.success('删除成功');
+                            }
+                            else {
+                                this.$Message.error('删除失败');
+                            }
+                        });
                 }, 500);
             }
         },

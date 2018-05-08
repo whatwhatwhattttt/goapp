@@ -128,34 +128,6 @@
                 </Row>
             </Card>
         </Row>
-        <!--<Row>-->
-        <!--<Card>-->
-        <!--<Row>-->
-        <!--<Col span="7" offset="8">-->
-        <!--<Button v-if="this.transactiondata.run" type="error" long @click="stop_modal=true">强制停业</Button>-->
-        <!--<Button v-else type="primary" long @click="operate_modal=true">强制运营</Button>-->
-        <!--</Col>-->
-        <!--</Row>-->
-        <!--</Card>-->
-        <!--</Row>-->
-        <!--<Modal-->
-        <!--v-model="stop_modal"-->
-        <!--:loading="loading"-->
-        <!--@on-ok="run(0)">-->
-        <!--<p class="transactioninfo-message">-->
-        <!--<Icon type="information-circled"></Icon>-->
-        <!--<span>确请确认你的操作，此操作将产生重大影响</span>-->
-        <!--</p>-->
-        <!--</Modal>-->
-        <!--<Modal-->
-        <!--v-model="operate_modal"-->
-        <!--:loading="loading"-->
-        <!--@on-ok="run(1)">-->
-        <!--<p class="transactioninfo-message">-->
-        <!--<Icon type="information-circled"></Icon>-->
-        <!--<span>请确认你的操作，此操作将产生重大影响</span>-->
-        <!--</p>-->
-        <!--</Modal>-->
     </div>
 </template>
 <script>
@@ -172,16 +144,6 @@
             init () {
                 this.transactiondata = this.$route.query;
             }
-            //            run (state) {
-            //                if (state == 1) {
-            //                    // todo 向api请求使商店切换至运营状态
-            //                    this.transactiondata.run = 1;
-            //                }
-            //                else {
-            //                    // todo 向api请求使商店切换至停业状态
-            //                    this.transactiondata.run = 0;
-            //                }
-            //            }
         },
         mounted () {
             this.init();
