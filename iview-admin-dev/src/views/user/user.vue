@@ -14,6 +14,7 @@
                     <Col span="20">
                     <zxksearch :searchlist="searchlist"
                                :loading="loading"
+                               @zxk_init="init"
                                @zxksearch_f="search"
                                @zxksearch_s="zxksort">
                     </zxksearch>
@@ -112,9 +113,9 @@
                 table_total: null,
                 current_page: 1,
                 page_size: 10,
-                sort: 0,
                 place: null,
-                form: {},
+                form: {}
+                ,
                 rules: {
                     mobile_phone: [
                         {required: true, message: '账号不能为空', trigger: 'blur'},
@@ -124,7 +125,8 @@
                         {required: true, message: '密码不能为空', trigger: 'blur'},
                         {min: 6, max: 16, message: '密码在6-16位之间', trigger: 'blur'}
                     ]
-                },
+                }
+                ,
                 columns: [
                     {
                         type: 'expand',
@@ -148,7 +150,7 @@
                     },
                     {
                         title: '昵称',
-                        key: 'nicknickname'
+                        key: 'nickname'
                     },
                     {
                         title: '性别',
@@ -201,6 +203,7 @@
                         }
                     }
                 ],
+                serverdata: [''],
                 data: [],
                 searchlist: [
                     ['mail', '账号（邮箱）'],
@@ -210,122 +213,20 @@
                     ['qq', 'QQ'],
                     ['mobile_phone', '手机']
                 ],
-            };
+            }
+                ;
         },
         methods: {
             //初始化方法
             init(){
-                // todo 向api请求100条初始数据并放入serverdata
-                this.serverdata = {
-                    //以下为数据格式
-                    //数据库中该表共有数据条数
-                    datalength: 8,
-                    //100条初始数据
-                    data: [
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        },
-
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        },
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        },
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        },
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        },
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        },
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        },
-                        {
-                            mobile_phone: '18072078275',
-                            nicknickname: '哎呦我去',
-                            gander: 'man',
-                            age: '18',
-                            realname: 'zxk',
-                            mail: '475811666@qq.com',
-                            qq: '475811666',
-                            password: '123234123',
-                            id_card: '33333333333333333333',
-                            create_time: '2018-asd-22'
-                        }
-                    ]
-                };
-                this.table_total = this.serverdata.datalength;
-                this.changepage(1);
-                this.dataload();
+                // todo 向api请求数据并放入serverdata
+                this.axios.get('http://goapp.com/api/users')
+                    .then((response) => {
+                        this.serverdata.data = response.data.data;
+                        this.table_total = response.data.data.length;
+                        this.changepage(1);
+                    });
             },
-            //todo 搜索
             search(index){
                 this.loading = true;
                 setTimeout(() => {
@@ -340,10 +241,8 @@
             //排序
             zxksort(){
                 this.serverdata.data.reverse();
-                console.log(this.serverdata.data);
                 this.changepage(1);
             },
-            // todo 分页操作
             // index为页数
             changepage(index){
                 this.loading = true;
@@ -358,13 +257,10 @@
                     this.loading = false;
                 }, 500);
             },
+            //index为每页条数
             changepage_size(index){
                 this.page_size = index;
                 this.changepage(this.current_page);
-            },
-            //数据拉取
-            dataload(){
-                //todo 拉取所有数据
             },
             edit () {
                 this.loading = true;
@@ -373,15 +269,17 @@
                         setTimeout(() => {
                             this.loading = false;
                             this.edit_modal = false;
-                            //todo 修改api用户数据
-
-                            if (1)//判断api返回值
-                            {
-                                this.$Message.success('修改成功');
-                            }
-                            else {
-                                this.$Message.error('修改失败');
-                            }
+                            //todo 修改api用户数据 this.form.mail为该表单中mail值，以此为索引修改
+                            this.axios.post('http://goapp.com/api/users', this.form.mail)
+                                .then((response) => {
+                                    if (response == 1)//返回值判断
+                                    {
+                                        this.$Message.success('修改成功');
+                                    }
+                                    else {
+                                        this.$Message.error('修改失败');
+                                    }
+                                });
                         }, 500);
                     }
                     else {
@@ -395,17 +293,19 @@
                 setTimeout(() => {
                     this.loading = false;
                     this.del_modal = false;
-                    //todo 从api删除当前用户
-                    if (1)//判断api返回值
-                    {
-                        this.data.splice(this.place, 1);
-                        this.$Message.success('修改成功');
-                    }
-                    else {
-                        this.$Message.error('修改失败');
-                    }
+                    //todo 从api删除当前用户 this.form.mail为该表单中mail值，以此为索引删除
+                    this.axios.post('http://goapp.com/api/users', this.form.mail)
+                        .then((response) => {
+                            if (response == 1)//返回值判断
+                            {
+                                this.data.splice(this.place, 1);
+                                this.$Message.success('删除成功');
+                            }
+                            else {
+                                this.$Message.error('删除失败');
+                            }
+                        });
                 }, 500);
-
             }
         },
         mounted () {

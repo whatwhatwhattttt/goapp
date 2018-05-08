@@ -4,7 +4,7 @@
 <template>
     <div>
         <Row style="position:fixed;top:100px;z-index: 999;width:100%">
-        <Col span="21">
+            <Col span="21">
             <card>
                 <Row>
                     <Col span="3">
@@ -14,6 +14,7 @@
                     <Col span="20">
                     <zxksearch :searchlist="searchlist"
                                :loading="loading"
+                               @zxk_init="init"
                                @zxksearch_f="search"
                                @zxksearch_s="zxksort">
                     </zxksearch>
@@ -23,7 +24,7 @@
             </Col>
         </Row>
         <Row style="margin-top: 68px;margin-bottom: 50px;">
-        <Table border :loading="loading" :columns="columns" :data="data"></Table>
+            <Table border :loading="loading" :columns="columns" :data="data"></Table>
         </Row>
         <Row>
             <Card style="position:fixed;bottom:0px;z-index: 999;width:100%;height: 60px;">
@@ -45,7 +46,7 @@
                 </Col>
 
                 <Col span="3" offset="2">
-                <Button @click="add_modal=true" long>添加新权限</Button>
+                <Button type="primary" @click="add_modal=true" long>添加新权限</Button>
                 </Col>
             </Card>
         </Row>
@@ -109,7 +110,6 @@
                 table_total: null,
                 current_page: 1,
                 page_size: 10,
-                sort: 0,
                 place: null,
                 searchlist: [
                     ['name', '权限名'],
@@ -180,51 +180,55 @@
                         }
                     }
                 ],
+                serverdata: [''],
                 data: [],
-            }
-                ;
+            };
         },
         methods: {
             //初始化方法
             init(){
+                // todo 向api请求数据并放入serverdata
+                this.axios.get('http://goapp.com/api/users')
+                    .then((response) => {
+                        this.serverdata.data = response.data.data;
+                        this.table_total = response.data.data.length;
+                        this.changepage(1);
+                    });
                 // todo 向api请求100条初始数据并放入serverdata
-                this.serverdata = {
-                    //以下为数据格式
-                    //数据库中该表共有数据条数
-                    datalength: 7,
-                    //100条初始数据
-                    data: [{
-                        name: '123123',
-                        description: '123234123'
-                    },
-                        {
-                            name: '123123',
-                            description: '123234123'
-                        },
-                        {
-                            name: '123123',
-                            description: '123234123'
-                        },
-                        {
-                            name: '123123',
-                            description: '123234123'
-                        },
-                        {
-                            name: '123123',
-                            description: '123234123'
-                        },
-                        {
-                            name: '123123',
-                            description: '123234123'
-                        },
-                        {
-                            name: '123123',
-                            description: '123234123'
-                        }]
-                };
-                this.table_total = this.serverdata.datalength;
-                this.changepage(1);
-                this.dataload();
+//                this.serverdata = {
+//                    //以下为数据格式
+//                    //数据库中该表共有数据条数
+//                    datalength: 7,
+//                    //100条初始数据
+//                    data: [{
+//                        name: '123123',
+//                        description: '123234123'
+//                    },
+//                        {
+//                            name: '123123',
+//                            description: '123234123'
+//                        },
+//                        {
+//                            name: '123123',
+//                            description: '123234123'
+//                        },
+//                        {
+//                            name: '123123',
+//                            description: '123234123'
+//                        },
+//                        {
+//                            name: '123123',
+//                            description: '123234123'
+//                        },
+//                        {
+//                            name: '123123',
+//                            description: '123234123'
+//                        },
+//                        {
+//                            name: '123123',
+//                            description: '123234123'
+//                        }]
+//                };
             },
             //todo 搜索
             search(index){
@@ -232,8 +236,12 @@
                 setTimeout(() => {
                     if (index[0]) {
                         // todo 向api发送字符串并返回匹配数据
-                        //this.serverdata=
-                        this.init();
+                        this.axios.post('http://goapp.com/api/users', index)
+                            .then((response) => {
+                                this.serverdata.data = response.data.data;
+                                this.table_total = response.data.data.length;
+                                this.changepage(1);
+                            });
                     }
                     this.loading = false;
                 }, 500);
@@ -241,7 +249,6 @@
             //排序
             zxksort(){
                 this.serverdata.data.reverse();
-                console.log(this.serverdata.data);
                 this.changepage(1);
             },
             // todo 分页操作
@@ -263,10 +270,6 @@
                 this.page_size = index;
                 this.changepage(this.current_page);
             },
-            //数据拉取
-            dataload(){
-                //todo 拉取所有数据
-            },
             add () {
                 this.loading = true;
                 this.$refs.add_Form.validate((valid) => {
@@ -274,16 +277,18 @@
                         setTimeout(() => {
                             this.loading = false;
                             this.add_modal = false;
-                            //todo 向api请求修改
-                            if (1) //api返回条件
-                            {
-                                this.form = [];
-                                this.$Message.success('添加成功');
-                            }
-                            else {
-                                this.$Message.error('添加失败-');
-                            }
-
+                            //todo 向api请求插入数据 this.form.mail为该表单中mail值，以此为索引修改
+                            this.axios.post('http://goapp.com/api/users', this.form)
+                                .then((response) => {
+                                    if (response == 1)//返回值判断
+                                    {
+                                        this.form = [];
+                                        this.$Message.success('添加成功');
+                                    }
+                                    else {
+                                        this.$Message.error('添加失败');
+                                    }
+                                });
                         }, 500);
                     }
                     else {
@@ -299,19 +304,22 @@
                         setTimeout(() => {
                             this.loading = false;
                             this.edit_modal = false;
-                            //todo 向api请求修改
-                            if (1) //api返回条件
-                            {
-                                this.$Message.success('修改成功');
-                            }
-                            else {
-                                this.$Message.error('修改失败');
-                            }
+                            //todo 修改api数据
+                            this.axios.post('http://goapp.com/api/users', this.form.admin_id)
+                                .then((response) => {
+                                    if (response == 1)//返回值判断
+                                    {
+                                        this.$Message.success('修改成功');
+                                    }
+                                    else {
+                                        this.$Message.error('修改失败');
+                                    }
+                                });
                         }, 500);
                     }
                     else {
                         this.loading = false;
-                        this.$Message.error('修改失败-请完善表单后重新提交');
+                        this.$Message.error('修改失败-请完善表单信息后重新提交');
                     }
                 });
             },
@@ -320,15 +328,18 @@
                 setTimeout(() => {
                     this.loading = false;
                     this.del_modal = false;
-                    //todo 向api请求修改
-                    if (1) //api返回条件
-                    {
-                        this.data.splice(this.place, 1);
-                        this.$Message.success('删除成功');
-                    }
-                    else {
-                        this.$Message.error('删除失败');
-                    }
+                    //todo 从api删除
+                    this.axios.post('http://goapp.com/api/users', this.form.admin_id)
+                        .then((response) => {
+                            if (response == 1)//返回值判断
+                            {
+                                this.data.splice(this.place, 1);
+                                this.$Message.success('删除成功');
+                            }
+                            else {
+                                this.$Message.error('删除失败');
+                            }
+                        });
                 }, 500);
             }
         },
