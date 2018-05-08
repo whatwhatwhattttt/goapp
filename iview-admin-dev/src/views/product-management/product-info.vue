@@ -170,17 +170,18 @@
             run (state) {
                 this.loading = true;
                 setTimeout(() => {
-                    if (state == 1) {
-                        // todo 向api请求使产品切换至上架状态
-                        this.productdata.run = 1;
-                    }
-                    else {
-                        // todo 向api请求使产品切换至下架状态
-                        this.productdata.run = 0;
-                    }
+                    //  todo 切换产品上架状态即可
+                    this.axios.post('http://goapp.com/api/users')
+                        .then((response) => {
+                            if (response == 1) {
+                                this.productdata.run = 1;
+                            }
+                            else {
+                                this.productdata.run = 0;
+                            }
+                        });
                     this.loading = false;
                 }, 500);
-
             }
         },
         mounted () {

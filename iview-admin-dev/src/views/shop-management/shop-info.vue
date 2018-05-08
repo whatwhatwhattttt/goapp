@@ -162,14 +162,16 @@
             run (state) {
                 this.loading = true;
                 setTimeout(() => {
-                    if (state == 1) {
-                        // todo 向api请求使商店切换至运营状态
-                        this.shopdata.run = 1;
-                    }
-                    else {
-                        // todo 向api请求使商店切换至停业状态
-                        this.shopdata.run = 0;
-                    }
+                    //  todo 切换商店运营状态即可
+                    this.axios.post('http://goapp.com/api/users')
+                        .then((response) => {
+                            if (response == 1) {
+                                this.shopdata.run = 1;
+                            }
+                            else {
+                                this.shopdata.run = 0;
+                            }
+                        });
                     this.loading = false;
                 }, 500);
             }

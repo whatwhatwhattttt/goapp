@@ -14,6 +14,7 @@
                     <Col span="20">
                     <zxksearch :searchlist="searchlist"
                                :loading="loading"
+                               @zxk_init="init"
                                @zxksearch_f="search"
                                @zxksearch_s="zxksort">
                     </zxksearch>
@@ -53,7 +54,7 @@
                     <Input type="text" v-model="form.name" class="system-text" readonly
                            placeholder="产品名称"/><br>
                 </FormItem>
-                <FormItem label="店铺名称" prop="shop.name">
+                <FormItem label="店铺名称" prop="shop_name">
                     <Input type="text" v-model="form.shop_name" class="system-text" readonly
                            placeholder="店铺名称"/><br>
                 </FormItem>
@@ -162,89 +163,97 @@
                         }
                     }
                 ],
+                serverdata: [''],
                 data: []
             };
         },
         methods: {
             //初始化方法
             init(){
-                // todo 向api请求100条初始数据并放入serverdata
-                this.serverdata = {
-                    //以下为数据格式
-                    //数据库中该表共有数据条数
-                    datalength: 7,
-                    //100条初始数据
-                    data: [
-                        {
-                            name: 'John Brown',
-                            user_name: 18,
-                            create_time: 'New York No. 1 Lake Park',
-                            description: '24351166166163113431',
-                            state: '未审核'
-                        },
-                        {
-                            name: 'John Brown',
-                            user_name: 18,
-                            create_time: 'New York No. 1 Lake Park',
-                            description: '24351166166163113431',
-                            state: '未审核'
-                        },
-                        {
-                            name: 'John Brown',
-                            user_name: 18,
-                            create_time: 'New York No. 1 Lake Park',
-                            description: '24351166166163113431',
-                            state: '未审核'
-                        },
-                        {
-                            name: 'John Brown',
-                            user_name: 18,
-                            create_time: 'New York No. 1 Lake Park',
-                            description: '24351166166163113431',
-                            state: '未审核'
-                        },
-                        {
-                            name: 'John Brown',
-                            user_name: 18,
-                            create_time: 'New York No. 1 Lake Park',
-                            description: '24351166166163113431',
-                            state: '未审核'
-                        },
-                        {
-                            name: 'John Brown',
-                            user_name: 18,
-                            create_time: 'New York No. 1 Lake Park',
-                            description: '24351166166163113431',
-                            state: '未审核'
-                        },
-                        {
-                            name: 'John Brown',
-                            user_name: 18,
-                            create_time: 'New York No. 1 Lake Park',
-                            description: '24351166166163113431',
-                            state: '未审核'
-                        },
-                        {
-                            name: 'John Brown',
-                            user_name: 18,
-                            create_time: 'New York No. 1 Lake Park',
-                            description: '24351166166163113431',
-                            state: '未审核'
-                        }
-                    ]
-                };
-                this.table_total = this.serverdata.datalength;
-                this.changepage(1);
-                this.dataload();
+                // todo 向api请求数据并放入serverdata
+                this.axios.get('http://goapp.com/api/users')
+                    .then((response) => {
+                        this.serverdata.data = response.data.data;
+                        this.table_total = response.data.data.length;
+                        this.changepage(1);
+                    });
+//                this.serverdata = {
+//                    //以下为数据格式
+//                    //数据库中该表共有数据条数
+//                    datalength: 7,
+//                    //100条初始数据
+//                    data: [
+//                        {
+//                            name: 'John Brown',
+//                            user_name: 18,
+//                            create_time: 'New York No. 1 Lake Park',
+//                            description: '24351166166163113431',
+//                            state: '未审核'
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            user_name: 18,
+//                            create_time: 'New York No. 1 Lake Park',
+//                            description: '24351166166163113431',
+//                            state: '未审核'
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            user_name: 18,
+//                            create_time: 'New York No. 1 Lake Park',
+//                            description: '24351166166163113431',
+//                            state: '未审核'
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            user_name: 18,
+//                            create_time: 'New York No. 1 Lake Park',
+//                            description: '24351166166163113431',
+//                            state: '未审核'
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            user_name: 18,
+//                            create_time: 'New York No. 1 Lake Park',
+//                            description: '24351166166163113431',
+//                            state: '未审核'
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            user_name: 18,
+//                            create_time: 'New York No. 1 Lake Park',
+//                            description: '24351166166163113431',
+//                            state: '未审核'
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            user_name: 18,
+//                            create_time: 'New York No. 1 Lake Park',
+//                            description: '24351166166163113431',
+//                            state: '未审核'
+//                        },
+//                        {
+//                            name: 'John Brown',
+//                            user_name: 18,
+//                            create_time: 'New York No. 1 Lake Park',
+//                            description: '24351166166163113431',
+//                            state: '未审核'
+//                        }
+//                    ]
+//                };
             },
-            //todo 搜索
+            //搜索
             search(index){
                 this.loading = true;
                 setTimeout(() => {
                     if (index[0]) {
                         // todo 向api发送字符串并返回匹配数据
-                        //this.serverdata=
-                        this.init();
+                        this.axios.post('http://goapp.com/api/users', index)
+                            .then((response) => {
+                                this.serverdata.data = response.data.data;
+                                this.table_total = response.data.data.length;
+                                this.changepage(1);
+                            });
                     }
                     this.loading = false;
                 }, 500);
@@ -264,7 +273,6 @@
             //排序
             zxksort(){
                 this.serverdata.data.reverse();
-                console.log(this.serverdata.data);
                 this.changepage(1);
             },
             // todo 分页操作
@@ -286,10 +294,6 @@
                 this.page_size = index;
                 this.changepage(this.current_page);
             },
-            //数据拉取
-            dataload(){
-                //todo 拉取所有数据
-            },
             approval (state) {
                 //state的值是0（未审核） 1（通过）或-1（不通过）
                 this.loading = true;
@@ -298,22 +302,24 @@
                         setTimeout(() => {
                             this.loading = false;
                             this.approval_modal = false;
-                            //todo 请求api修改产品审核表数据
-
-                            if (state == 1)//判断api返回值
-                            {
-                                this.data[this.place].state = '审核通过';
-                                this.data.splice(this.place, 1);
-                                this.$Message.success('已审核-审核通过');
-                            }
-                            else if (state == -1) {
-                                this.data[this.place].state = '审核未通过';
-                                this.data.splice(this.place, 1);
-                                this.$Message.success('已审核-审核未通过');
-                            }
-                            else {
-                                this.$Message.error('审核失败');
-                            }
+                            this.axios.post('http://goapp.com/api/users', state)
+                                .then((response) => {
+                                    if (response == 1)//判断api返回值
+                                    {
+                                        this.data[this.place].state = '审核通过';
+                                        //审核后在当前表中移除显示
+                                        this.data.splice(this.place, 1);
+                                        this.$Message.success('已审核-审核通过');
+                                    }
+                                    else if (response == -1) {
+                                        this.data[this.place].state = '审核未通过';
+                                        this.data.splice(this.place, 1);
+                                        this.$Message.success('已审核-审核未通过');
+                                    }
+                                    else {
+                                        this.$Message.error('审核失败');
+                                    }
+                                });
                         }, 500);
                     }
                 });

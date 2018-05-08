@@ -14,6 +14,7 @@
                     <Col span="20">
                     <zxksearch :searchlist="searchlist"
                                :loading="loading"
+                               @zxk_init="init"
                                @zxksearch_f="search"
                                @zxksearch_s="zxksort">
                     </zxksearch>
@@ -54,14 +55,12 @@
                 table_total: null,
                 current_page: 1,
                 page_size: 10,
-                sort: 0,
                 loading: false,
                 place: null,
                 searchlist: [
-                    ['wechat', '微信账号'],
-                    ['wechat_balance', '微信账号内资金'],
-                    ['alipay', '支付宝账号'],
-                    ['alipay_balance', '支付宝账号内资金']
+                    ['id', '交易编号'],
+                    ['buyers_name', '买家'],
+                    ['shop_name', '店铺名']
                 ],
                 columns: [
                     {
@@ -118,57 +117,64 @@
         methods: {
             //初始化方法
             init(){
-                // todo 向api请求100条初始数据并放入serverdata
-                this.serverdata = {
-                    //以下为数据格式
-                    //数据库中该表共有数据条数
-                    datalength: 1,
-                    //100条初始数据
-                    data: [
-                        {
-                            // 交易编号
-                            id: '123123',
-                            // 商品名称
-                            name: '黄瓜',
-                            // 买家昵称
-                            buyers_name: 'zxk',
-                            // 商店名称
-                            shop_name: 'zxksdfs',
-                            // 卖家昵称
-                            seller_name: 'sdfsdf',
-                            // 物品价格
-                            price: 'asdfsdf',
-                            // 交易状态
-                            state: '已关闭',
-                            // 物品位置
-                            position: '浙江省温州市。。。',
-                            // 买家联系方式
-                            buyers_phone: '18044444444',
-                            // 卖家联系方式
-                            seller_phone: '15233333333',
-                            // 物品类型
-                            type: '蔬菜',
-                            // 货物介绍
-                            description: '新鲜蔬菜',
-                            // 交易发起时间
-                            create_time: '2017-8-9',
-                            // 交易更新时间
-                            updata_time: '2017-8-12'
-                        }
-                    ]
-                };
-                this.table_total = this.serverdata.datalength;
-                this.changepage(1);
-                this.dataload();
+                // todo 向api请求数据并放入serverdata
+                this.axios.get('http://goapp.com/api/users')
+                    .then((response) => {
+                        this.serverdata.data = response.data.data;
+                        this.table_total = response.data.data.length;
+                        this.changepage(1);
+                    });
+//                this.serverdata = {
+//                    //以下为数据格式
+//                    //数据库中该表共有数据条数
+//                    datalength: 1,
+//                    //100条初始数据
+//                    data: [
+//                        {
+//                            // 交易编号
+//                            id: '123123',
+//                            // 商品名称
+//                            name: '黄瓜',
+//                            // 买家昵称
+//                            buyers_name: 'zxk',
+//                            // 商店名称
+//                            shop_name: 'zxksdfs',
+//                            // 卖家昵称
+//                            seller_name: 'sdfsdf',
+//                            // 物品价格
+//                            price: 'asdfsdf',
+//                            // 交易状态
+//                            state: '已关闭',
+//                            // 物品位置
+//                            position: '浙江省温州市。。。',
+//                            // 买家联系方式
+//                            buyers_phone: '18044444444',
+//                            // 卖家联系方式
+//                            seller_phone: '15233333333',
+//                            // 物品类型
+//                            type: '蔬菜',
+//                            // 货物介绍
+//                            description: '新鲜蔬菜',
+//                            // 交易发起时间
+//                            create_time: '2017-8-9',
+//                            // 交易更新时间
+//                            updata_time: '2017-8-12'
+//                        }
+//                    ]
+//                };
             },
-            //todo 搜索
+            //搜索
             search(index){
                 this.loading = true;
                 setTimeout(() => {
                     if (index[0]) {
                         // todo 向api发送字符串并返回匹配数据
-                        //this.serverdata=
-                        this.init();
+                        this.axios.post('http://goapp.com/api/users', index)
+                            .then((response) => {
+                                this.serverdata.data = response.data.data;
+                                this.table_total = response.data.data.length;
+                                this.changepage(1);
+                            });
                     }
                     this.loading = false;
                 }, 500);
@@ -176,7 +182,6 @@
             //排序
             zxksort(){
                 this.serverdata.data.reverse();
-                console.log(this.serverdata.data);
                 this.changepage(1);
             },
             // todo 分页操作
@@ -197,10 +202,6 @@
             changepage_size(index){
                 this.page_size = index;
                 this.changepage(this.current_page);
-            },
-            //数据拉取
-            dataload(){
-                //todo 拉取所有数据
             },
             showinfo () {
                 let query = this.data[this.place];
